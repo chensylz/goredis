@@ -4,9 +4,12 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
+
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/sirupsen/logrus"
 
 	"github.com/chensylz/goredis/internal/global/constants"
-	"github.com/sirupsen/logrus"
 )
 
 type Log interface {
@@ -60,18 +63,16 @@ func NewLogrus() *Logrus {
 }
 
 func newFileWriter(logFilePath string) (io.Writer, error) {
-	// 创建一个日志文件
-	file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	writer, err := rotatelogs.New(
+		logFilePath+".%Y%m%d%H%M",
+		//rotatelogs.WithLinkName(baseLogPath),      // 生成软链，指向最新日志文件
+		rotatelogs.WithMaxAge(7*24*time.Hour),     // 文件最大保存时间
+		rotatelogs.WithRotationTime(24*time.Hour), // 日志切割时间间隔
+	)
 	if err != nil {
 		return nil, err
 	}
-
-	fileWriter := &limitedWriter{
-		file:      file,
-		limitSize: 10 * 1024 * 1024, // 10MB
-	}
-
-	return fileWriter, nil
+	return writer, nil
 }
 
 type limitedWriter struct {
