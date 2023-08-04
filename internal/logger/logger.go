@@ -13,6 +13,9 @@ import (
 )
 
 type Log interface {
+	Info(args ...interface{})
+	Error(args ...interface{})
+	Debug(args ...interface{})
 	Debugf(format string, args ...interface{})
 	Infof(format string, args ...interface{})
 	Errorf(format string, args ...interface{})
@@ -26,6 +29,18 @@ type Logrus struct {
 
 func SetupLog() {
 	rLog = NewLogrus()
+}
+
+func Info(args ...interface{}) {
+	rLog.Info(args...)
+}
+
+func Error(args ...interface{}) {
+	rLog.Error(args...)
+}
+
+func Debug(args ...interface{}) {
+	rLog.Debug(args...)
 }
 
 func Debugf(format string, args ...interface{}) {
@@ -65,7 +80,6 @@ func NewLogrus() *Logrus {
 func newFileWriter(logFilePath string) (io.Writer, error) {
 	writer, err := rotatelogs.New(
 		logFilePath+".%Y%m%d%H%M",
-		//rotatelogs.WithLinkName(baseLogPath),      // 生成软链，指向最新日志文件
 		rotatelogs.WithMaxAge(7*24*time.Hour),     // 文件最大保存时间
 		rotatelogs.WithRotationTime(24*time.Hour), // 日志切割时间间隔
 	)
@@ -73,31 +87,6 @@ func newFileWriter(logFilePath string) (io.Writer, error) {
 		return nil, err
 	}
 	return writer, nil
-}
-
-type limitedWriter struct {
-	file      *os.File
-	limitSize int
-	written   int
-}
-
-func (w *limitedWriter) Write(p []byte) (n int, err error) {
-	if w.written+len(p) > w.limitSize {
-		// 达到文件大小限制时，重新创建文件
-		w.file.Close()
-		newFile, err := os.OpenFile(w.file.Name(), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
-		if err != nil {
-			return 0, err
-		}
-		w.file = newFile
-		w.written = 0
-	}
-
-	n, err = w.file.Write(p)
-	if err == nil {
-		w.written += n
-	}
-	return
 }
 
 func (l *Logrus) Debugf(format string, args ...interface{}) {
@@ -110,4 +99,16 @@ func (l *Logrus) Infof(format string, args ...interface{}) {
 
 func (l *Logrus) Errorf(format string, args ...interface{}) {
 	l.log.Errorf(format, args...)
+}
+
+func (l *Logrus) Debug(args ...interface{}) {
+	l.log.Debug(args...)
+}
+
+func (l *Logrus) Info(args ...interface{}) {
+	l.log.Info(args...)
+}
+
+func (l *Logrus) Error(args ...interface{}) {
+	l.log.Error(args...)
 }
