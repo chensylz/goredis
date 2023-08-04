@@ -1,42 +1,102 @@
 package logger
 
 import (
-	"time"
+	"io"
+	"log"
+	"os"
 
-	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/chensylz/goredis/internal/global/constants"
 	"github.com/sirupsen/logrus"
 )
 
-type Logger interface {
+type Log interface {
 	Debugf(format string, args ...interface{})
 	Infof(format string, args ...interface{})
 	Errorf(format string, args ...interface{})
 }
 
+var rLog Log
+
 type Logrus struct {
 	log *logrus.Logger
 }
 
+func SetupLog() {
+	rLog = NewLogrus()
+}
+
+func Debugf(format string, args ...interface{}) {
+	rLog.Debugf(format, args...)
+}
+
+func Infof(format string, args ...interface{}) {
+	rLog.Infof(format, args...)
+}
+
+func Errorf(format string, args ...interface{}) {
+	rLog.Errorf(format, args...)
+}
+
 func NewLogrus() *Logrus {
-	log := logrus.New()
+	logureLog := logrus.New()
 	logFilePath := "logs/log"
 	// 设置日志格式，可以根据需要进行调整
-	log.SetFormatter(&logrus.TextFormatter{})
+	logureLog.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: constants.TimestampFormat,
+		FullTimestamp:   true,
+		ForceColors:     true,
+	})
 
-	// 使用 rotatelogs 创建轮转日志文件
-	rotateLog, err := rotatelogs.New(
-		logFilePath+".%Y%m%d%H%M",
-		rotatelogs.WithLinkName(logFilePath),
-		rotatelogs.WithMaxAge(7*24*time.Hour),     // 最大保留时间
-		rotatelogs.WithRotationTime(24*time.Hour), // 轮转周期
-	)
+	// 创建一个 WriteSyncer，用于同时输出到文件和终端
+	fileWriter, err := newFileWriter(logFilePath)
 	if err != nil {
 		log.Panicf("config local file system logger error. %v", err)
 		return nil
 	}
-	log.SetOutput(rotateLog)
+	multiWriter := io.MultiWriter(os.Stdout, fileWriter)
+	logureLog.SetOutput(multiWriter)
 
-	return &Logrus{log: log}
+	return &Logrus{log: logureLog}
+}
+
+func newFileWriter(logFilePath string) (io.Writer, error) {
+	// 创建一个日志文件
+	file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	if err != nil {
+		return nil, err
+	}
+
+	fileWriter := &limitedWriter{
+		file:      file,
+		limitSize: 10 * 1024 * 1024, // 10MB
+	}
+
+	return fileWriter, nil
+}
+
+type limitedWriter struct {
+	file      *os.File
+	limitSize int
+	written   int
+}
+
+func (w *limitedWriter) Write(p []byte) (n int, err error) {
+	if w.written+len(p) > w.limitSize {
+		// 达到文件大小限制时，重新创建文件
+		w.file.Close()
+		newFile, err := os.OpenFile(w.file.Name(), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+		if err != nil {
+			return 0, err
+		}
+		w.file = newFile
+		w.written = 0
+	}
+
+	n, err = w.file.Write(p)
+	if err == nil {
+		w.written += n
+	}
+	return
 }
 
 func (l *Logrus) Debugf(format string, args ...interface{}) {
