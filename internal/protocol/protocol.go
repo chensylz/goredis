@@ -1,6 +1,6 @@
 package protocol
 
 type Processor interface {
-	Parse(input string) (interface{}, error)
-	Execute(command interface{}) (interface{}, error)
+	Decode(input []byte) (interface{}, error)
+	Encode(values string) (interface{}, error)
 }
