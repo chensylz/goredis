@@ -1,7 +1,7 @@
 package storage
 
-import "github.com/chensylz/goredis/internal/server/connections"
+import "github.com/chensylz/goredis/internal/protocol"
 
 type Storage interface {
-	Exec(server *connections.Server, args [][]byte) ([]byte, error)
+	Exec(args [][]byte) *protocol.ProtoValue
 }

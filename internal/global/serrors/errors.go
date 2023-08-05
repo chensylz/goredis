@@ -1,11 +1,52 @@
 package serrors
 
-const symbol = "\r\n"
+import "github.com/chensylz/goredis/internal/protocol"
 
-var (
-	ErrProtocol        = []byte("-ERR Protocol content error" + symbol)
-	ErrExec            = []byte("-ERR Exec error" + symbol)
-	ErrSyntaxIncorrect = []byte("-ERR Syntax incorrect" + symbol)
-	Ok                 = []byte("+OK" + symbol)
-	NilBulk            = []byte("$-1" + symbol)
-)
+func NewErrProtocol() *protocol.ProtoValue {
+	return &protocol.ProtoValue{
+		Type:  protocol.Error,
+		Value: "ERR Protocol content error",
+	}
+}
+
+func NewErrExec() *protocol.ProtoValue {
+	return &protocol.ProtoValue{
+		Type:  protocol.Error,
+		Value: "ERR Exec error",
+	}
+}
+
+func NewErrUnknown() *protocol.ProtoValue {
+	return &protocol.ProtoValue{
+		Type:  protocol.Error,
+		Value: "ERR Unknown error",
+	}
+}
+
+func NewOk() *protocol.ProtoValue {
+	return &protocol.ProtoValue{
+		Type:  protocol.SimpleString,
+		Value: "OK",
+	}
+}
+
+func NewBulkString(value string) *protocol.ProtoValue {
+	return &protocol.ProtoValue{
+		Type:  protocol.BulkString,
+		Value: value,
+	}
+}
+
+func NewNilBulk() *protocol.ProtoValue {
+	return &protocol.ProtoValue{
+		Type:  protocol.BulkString,
+		Value: "-1",
+	}
+}
+
+func NewErrSyntaxIncorrect() *protocol.ProtoValue {
+	return &protocol.ProtoValue{
+		Type:  protocol.Error,
+		Value: "ERR Syntax incorrect",
+	}
+}

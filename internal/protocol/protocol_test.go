@@ -1,6 +1,8 @@
 package protocol_test
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"testing"
 
@@ -26,17 +28,17 @@ func TestProtocolTestSuite(t *testing.T) {
 }
 
 func (s *ProtocolTestSuite) TestRESP() {
-	respData := []byte("*3\r\n$5\r\nHello\r\n:123\r\n-Error\r\n")
-	expectedDecoded := protocol.RESPValue{
+	respData := []byte("*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$3\r\nvalue\r\n")
+	expectedDecoded := protocol.ProtoValue{
 		Type: protocol.Array,
-		Value: []protocol.RESPValue{
-			{Type: protocol.BulkString, Value: "Hello"},
-			{Type: protocol.Integer, Value: "123"},
-			{Type: protocol.Error, Value: "Error"},
+		Value: []protocol.ProtoValue{
+			{Type: protocol.BulkString, Value: "SET"},
+			{Type: protocol.BulkString, Value: "key"},
+			{Type: protocol.BulkString, Value: "value"},
 		},
 	}
 	respProtocol := protocol.NewRESP()
-	decoded, err := respProtocol.Decode(respData)
+	decoded, err := respProtocol.Decode(bufio.NewReader(bytes.NewReader(respData)))
 	s.NoError(err)
 	s.Equal(expectedDecoded, decoded)
 }

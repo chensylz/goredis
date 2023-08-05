@@ -6,12 +6,13 @@ import (
 	"net"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
+	"time"
 
 	"github.com/chensylz/goredis/config"
 	"github.com/chensylz/goredis/internal/logger"
 	"github.com/chensylz/goredis/internal/server/handler"
+	"github.com/chensylz/goredis/pkg/wait"
 )
 
 type App struct {
@@ -55,11 +56,11 @@ func (a *App) Address() string {
 }
 
 func (a *App) acceptConnections(ctx context.Context, listener net.Listener) {
-	var wg sync.WaitGroup
+	var wg wait.Wait
 	for {
 		select {
 		case <-ctx.Done():
-			wg.Wait()
+			wg.WaitWithTimeout(10 * time.Second)
 			return
 		default:
 			conn, err := listener.Accept()
@@ -68,20 +69,17 @@ func (a *App) acceptConnections(ctx context.Context, listener net.Listener) {
 			}
 			go func() {
 				wg.Add(1)
-				a.handleConnection(ctx, conn, &wg)
+				a.handleConnection(ctx, conn)
+				defer wg.Done()
 			}()
 		}
 	}
 }
 
-func (a *App) handleConnection(ctx context.Context, conn net.Conn, wg *sync.WaitGroup) {
-	defer func() {
-		_ = conn.Close()
-		_ = wg.Done
-	}()
-
+func (a *App) handleConnection(ctx context.Context, conn net.Conn) {
 	select {
 	case <-ctx.Done():
+		a.handler.Close()
 		return
 	default:
 		a.handler.Handle(ctx, conn)

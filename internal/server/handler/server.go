@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bufio"
+	"context"
 	"io"
 	"net"
 	"sync"
@@ -21,57 +22,78 @@ type Server struct {
 	Storage     storage.Storage
 }
 
-func NewServer() *Server {
-	return &Server{}
+func NewServer(process protocol.Processor, storage storage.Storage) *Server {
+	return &Server{
+		Processor: process,
+		Storage:   storage,
+	}
 }
 
-func (s *Server) Handle(conn net.Conn) {
+func (s *Server) Handle(ctx context.Context, conn net.Conn) {
 	if s.Active.Load() {
 		_ = conn.Close()
 		return
 	}
 	serverConn := connections.NewServer(conn)
 	s.Connections.Store(serverConn, struct{}{})
+	logger.Infof("client %s connected", serverConn.Address())
 	reader := bufio.NewReader(conn)
 	for {
-		data, err := s.Processor.Decode(reader)
-		if err != nil {
-			if err == io.EOF {
-				logger.Infof("client %s close connection", serverConn.Address())
-				s.Connections.Delete(serverConn)
-			} else {
-				logger.Errorf("read message error: %s", err)
-				err = serverConn.Write(serrors.ErrProtocol)
-				if err != nil {
-					logger.Errorf("conn write error: %s", err)
-				}
-			}
+		_, ok := s.Connections.Load(serverConn)
+		if !ok {
 			return
 		}
-		msg := data.ToCommand()
-		logger.Infof("receive message: %s", msg)
-		result, err := s.Storage.Exec(serverConn, msg)
-		if err != nil {
-			logger.Errorf("exec message error: %s", err)
-			err = serverConn.Write(serrors.ErrExec)
-			if err != nil {
-				logger.Errorf("conn write error: %s", err)
-			}
+		select {
+		case <-ctx.Done():
+			_ = conn.Close()
 			return
-		}
-		err = serverConn.Write(result)
-		if err != nil {
-			logger.Errorf("conn write error: %s", err)
-			return
+		default:
+			s.handler(reader, serverConn)
 		}
 	}
 }
 
+func (s *Server) handler(reader *bufio.Reader, serverConn *connections.Server) {
+	data, err := s.Processor.Decode(reader)
+	if err != nil {
+		if err == io.EOF {
+			logger.Infof("client %s close connection", serverConn.Address())
+			s.Connections.Delete(serverConn)
+		} else {
+			logger.Errorf("read message error: %s", err)
+			err = serverConn.Write(s.Processor.MustEncode(serrors.NewErrProtocol()))
+			if err != nil {
+				logger.Errorf("conn write error: %s", err)
+			}
+		}
+		return
+	}
+	msg := data.ToCommand()
+	logger.Infof("receive message: %s", msg)
+	value := s.Storage.Exec(msg)
+	result, err := s.Processor.Encode(value)
+	if err != nil {
+		logger.Errorf("encode message error: %s", err)
+		err = serverConn.Write(s.Processor.MustEncode(serrors.NewErrUnknown()))
+		if err != nil {
+			logger.Errorf("conn write error: %s", err)
+		}
+		return
+	}
+	err = serverConn.Write(result)
+	if err != nil {
+		logger.Errorf("conn write error: %s", err)
+		return
+	}
+}
+
 func (s *Server) Close() {
+	logger.Info("server closing...")
 	s.Active.Store(true)
 	s.Connections.Range(func(key, value interface{}) bool {
 		conn := key.(*connections.Server)
 		_ = conn.Close()
 		return true
 	})
+	logger.Info("server closed")
 }
