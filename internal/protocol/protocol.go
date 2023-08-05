@@ -5,6 +5,10 @@ import (
 )
 
 type Processor interface {
-	Decode(reader *bufio.Reader) (interface{}, error)
+	Decode(reader *bufio.Reader) (DataType, error)
 	Encode(values string) (interface{}, error)
+}
+
+type DataType interface {
+	ToCommand() [][]byte
 }

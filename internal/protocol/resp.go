@@ -32,8 +32,24 @@ func NewRESP() *RESP {
 	return &RESP{}
 }
 
-func (r *RESP) Decode(reader *bufio.Reader) (interface{}, error) {
-	return decodeRESP(reader)
+func (v *RESPValue) ToCommand() [][]byte {
+	value, ok := v.Value.([]RESPValue)
+	if ok {
+		var command [][]byte
+		for _, v := range value {
+			command = append(command, v.ToCommand()...)
+		}
+		return command
+	}
+	return [][]byte{[]byte(fmt.Sprintf("%s", v.Value))}
+}
+
+func (r *RESP) Decode(reader *bufio.Reader) (DataType, error) {
+	value, err := decodeRESP(reader)
+	if err != nil {
+		return nil, err
+	}
+	return &value, nil
 }
 
 func (r *RESP) Encode(values string) (interface{}, error) {

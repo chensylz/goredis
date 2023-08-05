@@ -54,10 +54,6 @@ func (a *App) Address() string {
 	return fmt.Sprintf("%s:%d", a.Bind, a.Port)
 }
 
-func (a *App) HandleConnection(ctx context.Context, conn net.Conn) {
-	a.handler.Handle(ctx, conn)
-}
-
 func (a *App) acceptConnections(ctx context.Context, listener net.Listener) {
 	var wg sync.WaitGroup
 	for {
@@ -88,6 +84,6 @@ func (a *App) handleConnection(ctx context.Context, conn net.Conn, wg *sync.Wait
 	case <-ctx.Done():
 		return
 	default:
-		a.HandleConnection(ctx, conn)
+		a.handler.Handle(ctx, conn)
 	}
 }
