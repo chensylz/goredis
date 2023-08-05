@@ -32,8 +32,8 @@ func NewRESP() *RESP {
 	return &RESP{}
 }
 
-func (r *RESP) Decode(input []byte) (interface{}, error) {
-	return decodeRESP(bufio.NewReader(bytes.NewReader(input)))
+func (r *RESP) Decode(reader *bufio.Reader) (interface{}, error) {
+	return decodeRESP(reader)
 }
 
 func (r *RESP) Encode(values string) (interface{}, error) {

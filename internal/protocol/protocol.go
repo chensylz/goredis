@@ -1,6 +1,10 @@
 package protocol
 
+import (
+	"bufio"
+)
+
 type Processor interface {
-	Decode(input []byte) (interface{}, error)
+	Decode(reader *bufio.Reader) (interface{}, error)
 	Encode(values string) (interface{}, error)
 }
