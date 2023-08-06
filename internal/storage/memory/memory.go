@@ -1,8 +1,9 @@
-package storage
+package memory
 
 import (
 	"github.com/chensylz/goredis/internal/global/serrors"
 	"github.com/chensylz/goredis/internal/protocol"
+	"github.com/chensylz/goredis/internal/storage"
 )
 
 type Memory struct {
@@ -14,10 +15,10 @@ func NewMemory() *Memory {
 }
 
 func (m *Memory) Exec(commands [][]byte) *protocol.ProtoValue {
-	switch string(commands[0]) {
-	case "SET":
+	switch storage.Func(commands[0]) {
+	case storage.SET:
 		return m.set(commands[1:])
-	case "GET":
+	case storage.GET:
 		return m.get(commands[1:])
 	default:
 		return serrors.NewErrSyntaxIncorrect()
