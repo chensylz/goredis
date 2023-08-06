@@ -1,9 +1,12 @@
 package logger
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
+	"runtime"
+	"strings"
 	"time"
 
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
@@ -24,7 +27,7 @@ type Log interface {
 var rLog Log
 
 type Logrus struct {
-	log *logrus.Logger
+	log *logrus.Entry
 }
 
 func SetupLog() {
@@ -73,8 +76,9 @@ func NewLogrus() *Logrus {
 	}
 	multiWriter := io.MultiWriter(os.Stdout, fileWriter)
 	logureLog.SetOutput(multiWriter)
+	logureLog.AddHook(&CallerHook{})
 
-	return &Logrus{log: logureLog}
+	return &Logrus{log: logureLog.WithFields(logrus.Fields{})}
 }
 
 func newFileWriter(logFilePath string) (io.Writer, error) {
@@ -87,6 +91,23 @@ func newFileWriter(logFilePath string) (io.Writer, error) {
 		return nil, err
 	}
 	return writer, nil
+}
+
+type CallerHook struct{}
+
+func (hook *CallerHook) Levels() []logrus.Level {
+	return logrus.AllLevels
+}
+
+func (hook *CallerHook) Fire(entry *logrus.Entry) error {
+	// 获取调用者信息
+	_, file, line, _ := runtime.Caller(9) // 调整参数以适应你的调用层数
+	parts := strings.Split(file, "/")
+	callerInfo := fmt.Sprintf("%s:%d", parts[len(parts)-1], line)
+
+	// 将调用者信息添加到日志字段中
+	entry.Data["caller"] = callerInfo
+	return nil
 }
 
 func (l *Logrus) Debugf(format string, args ...interface{}) {
