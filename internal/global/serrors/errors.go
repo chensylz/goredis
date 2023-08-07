@@ -30,7 +30,7 @@ func NewOk() *protocol.ProtoValue {
 	}
 }
 
-func NewBulkString(value string) *protocol.ProtoValue {
+func NewBulkString(value []byte) *protocol.ProtoValue {
 	return &protocol.ProtoValue{
 		Type:  protocol.BulkString,
 		Value: value,
