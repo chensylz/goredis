@@ -43,5 +43,5 @@ func (s *MemoryTestSuite) TestMemory() {
 	}
 	result = s.db.Exec(getCommand)
 	s.Equal(result.Type, protocol.BulkString)
-	s.Equal(result.Value, "value")
+	s.Equal(result.Value, []byte("value"))
 }
