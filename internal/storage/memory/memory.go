@@ -1,19 +1,17 @@
 package memory
 
 import (
-	"time"
-
 	"github.com/chensylz/goredis/internal/global/serrors"
 	"github.com/chensylz/goredis/internal/protocol"
 	"github.com/chensylz/goredis/internal/storage"
 )
 
 type Memory struct {
-	data map[string]storage.Entity
+	data map[string]*storage.Entity
 }
 
 func NewMemory() *Memory {
-	return &Memory{data: make(map[string]storage.Entity)}
+	return &Memory{data: make(map[string]*storage.Entity)}
 }
 
 func (m *Memory) Exec(commands [][]byte) *protocol.ProtoValue {
@@ -31,11 +29,7 @@ func (m *Memory) set(args [][]byte) *protocol.ProtoValue {
 	if len(args) != 2 {
 		return serrors.NewErrSyntaxIncorrect()
 	}
-	m.data[string(args[0])] = storage.Entity{
-		CreatedAt: time.Now().Unix(),
-		Size:      int64(len(args[1])),
-		Value:     args[1],
-	}
+	m.data[string(args[0])] = storage.NewEntity(args[1])
 	return serrors.NewOk()
 }
 
