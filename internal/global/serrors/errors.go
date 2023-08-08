@@ -40,7 +40,7 @@ func NewBulkString(value []byte) *protocol.ProtoValue {
 func NewNilBulk() *protocol.ProtoValue {
 	return &protocol.ProtoValue{
 		Type:  protocol.BulkString,
-		Value: "-1",
+		Value: "",
 	}
 }
 

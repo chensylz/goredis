@@ -17,7 +17,7 @@ type ProtoValue struct {
 }
 
 func (v *ProtoValue) ToCommand() [][]byte {
-	value, ok := v.Value.([]ProtoValue)
+	value, ok := v.Value.([]*ProtoValue)
 	if ok {
 		var command [][]byte
 		for _, v := range value {

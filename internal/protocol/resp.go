@@ -67,7 +67,7 @@ func (r *RESP) decodeArray(reader *bufio.Reader) (*ProtoValue, error) {
 	if err != nil {
 		return nil, err
 	}
-	arrayLength, err := strconv.Atoi(string(line[1:]))
+	arrayLength, err := strconv.Atoi(string(line[0]))
 	if err != nil {
 		return nil, err
 	}
@@ -211,6 +211,8 @@ func (r *RESP) encode(buffer *bytes.Buffer, data *ProtoValue) error {
 		r.encodeInteger(buffer, data)
 	case Array:
 		r.encodeArray(buffer, data)
+	case BulkString:
+		r.encodeBulkString(buffer, data)
 	default:
 		return errors.New("unknown protocol type")
 	}
@@ -219,6 +221,15 @@ func (r *RESP) encode(buffer *bytes.Buffer, data *ProtoValue) error {
 
 func (r *RESP) encodeSimpleString(buffer *bytes.Buffer, data *ProtoValue) {
 	buffer.WriteString(fmt.Sprintf("+%s\r\n", data.Value))
+}
+
+func (r *RESP) encodeBulkString(buffer *bytes.Buffer, data *ProtoValue) {
+	str, ok := data.Value.([]byte)
+	if !ok {
+		str = []byte(data.Value.(string))
+	}
+	length := len(str)
+	buffer.WriteString(fmt.Sprintf("$%d\r\n%s\r\n", length, str))
 }
 
 func (r *RESP) encodeError(buffer *bytes.Buffer, data *ProtoValue) {
