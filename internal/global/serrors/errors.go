@@ -50,3 +50,10 @@ func NewErrSyntaxIncorrect() *protocol.ProtoValue {
 		Value: "ERR Syntax incorrect",
 	}
 }
+
+func NewErrKeyNotFound() *protocol.ProtoValue {
+	return &protocol.ProtoValue{
+		Type:  protocol.Error,
+		Value: "ERR Key not found",
+	}
+}
