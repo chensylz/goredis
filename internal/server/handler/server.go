@@ -68,9 +68,8 @@ func (s *Server) handler(reader *bufio.Reader, serverConn *connections.Server) {
 		}
 		return
 	}
-	msg := data.ToCommand()
-	logger.Infof("receive message: %s", msg)
-	value := s.Storage.Exec(msg)
+	logger.Infof("receive message: %s", data)
+	value := s.Storage.Exec(data)
 	result, err := s.Processor.Encode(value)
 	if err != nil {
 		logger.Errorf("encode message error: %s", err)

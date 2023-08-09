@@ -20,28 +20,29 @@ func (m *Memory) scanExpired() {
 	})
 }
 
-func (m *Memory) expire(args [][]byte) *protocol.ProtoValue {
+func (m *Memory) expire(args []*protocol.ProtoValue) *protocol.ProtoValue {
 	if len(args) != 2 {
 		return serrors.NewErrSyntaxIncorrect()
 	}
-	expiredAt, err := strconv.ParseInt(string(args[1]), 10, 64)
+	key := args[0].Value.(string)
+	expiredAt, err := strconv.ParseInt(args[1].Value.(string), 10, 64)
 	if err != nil {
 		return serrors.NewErrSyntaxIncorrect()
 	}
 	if expiredAt < time.Now().Unix() {
 		m.Lock()
-		delete(m.data, string(args[0]))
+		delete(m.data, key)
 		m.Unlock()
 		return serrors.NewOk()
 	}
 	m.Lock()
 	defer m.Unlock()
-	entity, ok := m.data[string(args[0])]
+	entity, ok := m.data[key]
 	if !ok {
 		return serrors.NewErrKeyNotFound()
 	}
 	entity.ExpiredAt = expiredAt
-	m.data[string(args[0])] = entity
-	m.expireMap.Store(string(args[0]), expiredAt)
+	m.data[key] = entity
+	m.expireMap.Store(key, expiredAt)
 	return serrors.NewOk()
 }

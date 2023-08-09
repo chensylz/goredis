@@ -24,14 +24,18 @@ func NewMemory() *Memory {
 	return m
 }
 
-func (m *Memory) Exec(commands [][]byte) *protocol.ProtoValue {
-	switch storage.Func(commands[0]) {
+func (m *Memory) Exec(commands *protocol.ProtoValue) *protocol.ProtoValue {
+	value, ok := commands.Value.([]*protocol.ProtoValue)
+	if !ok {
+		return serrors.NewErrSyntaxIncorrect()
+	}
+	switch storage.Func(value[0].Value.(string)) {
 	case storage.SET:
-		return m.set(commands[1:])
+		return m.set(value[1:])
 	case storage.GET:
-		return m.get(commands[1:])
+		return m.get(value[1:])
 	case storage.EXPIRE:
-		return m.expire(commands[1:])
+		return m.expire(value[1:])
 	default:
 		return serrors.NewErrSyntaxIncorrect()
 	}

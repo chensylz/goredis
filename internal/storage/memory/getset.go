@@ -6,22 +6,23 @@ import (
 	"github.com/chensylz/goredis/internal/storage"
 )
 
-func (m *Memory) set(args [][]byte) *protocol.ProtoValue {
+func (m *Memory) set(args []*protocol.ProtoValue) *protocol.ProtoValue {
 	if len(args) != 2 {
 		return serrors.NewErrSyntaxIncorrect()
 	}
-	m.data[string(args[0])] = storage.NewEntity(args[1])
+	value := args[1].Value.(string)
+	m.data[args[0].Value.(string)] = storage.NewEntity(value, int64(len(value)))
 	return serrors.NewOk()
 }
 
-func (m *Memory) get(args [][]byte) *protocol.ProtoValue {
+func (m *Memory) get(args []*protocol.ProtoValue) *protocol.ProtoValue {
 	if len(args) != 1 {
 		return serrors.NewErrSyntaxIncorrect()
 	}
 	m.RWMutex.RLock()
 	defer m.RWMutex.RUnlock()
-	if v, ok := m.data[string(args[0])]; ok {
-		return serrors.NewBulkString(v.Value.([]byte))
+	if v, ok := m.data[args[0].Value.(string)]; ok {
+		return serrors.NewBulkString(v.Value.(string))
 	}
 	return serrors.NewNilBulk()
 }

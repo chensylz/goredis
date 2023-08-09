@@ -30,18 +30,39 @@ func TestMemoryTestSuite(t *testing.T) {
 }
 
 func (s *MemoryTestSuite) TestMemory() {
-	setCommand := [][]byte{
-		[]byte("SET"),
-		[]byte("key"),
-		[]byte("value"),
+	setCommand := &protocol.ProtoValue{
+		Type: protocol.Array,
+		Value: []*protocol.ProtoValue{
+			{
+				Type:  protocol.BulkString,
+				Value: "SET",
+			},
+			{
+				Type:  protocol.BulkString,
+				Value: "key",
+			},
+			{
+				Type:  protocol.BulkString,
+				Value: "value",
+			},
+		},
 	}
 	result := s.db.Exec(setCommand)
 	s.NotEqual(result.Type, protocol.Error)
-	getCommand := [][]byte{
-		[]byte("GET"),
-		[]byte("key"),
+	getCommand := &protocol.ProtoValue{
+		Type: protocol.Array,
+		Value: []*protocol.ProtoValue{
+			{
+				Type:  protocol.BulkString,
+				Value: "GET",
+			},
+			{
+				Type:  protocol.BulkString,
+				Value: "key",
+			},
+		},
 	}
 	result = s.db.Exec(getCommand)
 	s.Equal(result.Type, protocol.BulkString)
-	s.Equal(result.Value, []byte("value"))
+	s.Equal(result.Value, "value")
 }

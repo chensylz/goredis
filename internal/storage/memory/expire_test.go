@@ -32,34 +32,88 @@ func TestExpireTestSuite(t *testing.T) {
 }
 
 func (s *ExpireTestSuite) TestExpire() {
-	s.db.Exec([][]byte{
-		[]byte("SET"),
-		[]byte("key"),
-		[]byte("value"),
+	s.db.Exec(&protocol.ProtoValue{
+		Type: protocol.Array,
+		Value: []*protocol.ProtoValue{
+			{
+				Type:  protocol.BulkString,
+				Value: "SET",
+			},
+			{
+				Type:  protocol.BulkString,
+				Value: "key",
+			},
+			{
+				Type:  protocol.BulkString,
+				Value: "value",
+			},
+		},
 	})
 	expiredAt := time.Now().Unix()
 	expiredAtBytes := []byte(strconv.FormatUint(uint64(expiredAt), 10))
-	s.db.Exec([][]byte{
-		[]byte("EXPIRE"),
-		[]byte("key"),
-		expiredAtBytes,
+	s.db.Exec(&protocol.ProtoValue{
+		Type: protocol.Array,
+		Value: []*protocol.ProtoValue{
+			{
+				Type:  protocol.BulkString,
+				Value: "EXPIRE",
+			},
+			{
+				Type:  protocol.BulkString,
+				Value: "key",
+			},
+			{
+				Type:  protocol.BulkString,
+				Value: string(expiredAtBytes),
+			},
+		},
 	})
 	time.Sleep(50 * time.Millisecond)
-	value := s.db.Exec([][]byte{
-		[]byte("GET"),
-		[]byte("key"),
+	value := s.db.Exec(&protocol.ProtoValue{
+		Type: protocol.Array,
+		Value: []*protocol.ProtoValue{
+			{
+				Type:  protocol.BulkString,
+				Value: "GET",
+			},
+			{
+				Type:  protocol.BulkString,
+				Value: "key",
+			},
+		},
 	})
 	s.Equal(protocol.BulkString, value.Type)
-	s.Equal([]byte("value"), value.Value)
+	s.Equal("value", value.Value)
 	time.Sleep(100 * time.Millisecond)
-	s.db.Exec([][]byte{
-		[]byte("EXPIRE"),
-		[]byte("key"),
-		expiredAtBytes,
+	s.db.Exec(&protocol.ProtoValue{
+		Type: protocol.Array,
+		Value: []*protocol.ProtoValue{
+			{
+				Type:  protocol.BulkString,
+				Value: "EXPIRE",
+			},
+			{
+				Type:  protocol.BulkString,
+				Value: "key",
+			},
+			{
+				Type:  protocol.BulkString,
+				Value: string(expiredAtBytes),
+			},
+		},
 	})
-	value = s.db.Exec([][]byte{
-		[]byte("GET"),
-		[]byte("key"),
+	value = s.db.Exec(&protocol.ProtoValue{
+		Type: protocol.Array,
+		Value: []*protocol.ProtoValue{
+			{
+				Type:  protocol.BulkString,
+				Value: "GET",
+			},
+			{
+				Type:  protocol.BulkString,
+				Value: "key",
+			},
+		},
 	})
 	s.Equal(protocol.BulkString, value.Type)
 	s.Equal("", value.Value)

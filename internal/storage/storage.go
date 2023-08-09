@@ -22,10 +22,10 @@ type Entity struct {
 	Value     interface{}
 }
 
-func NewEntity(value []byte) *Entity {
+func NewEntity(value interface{}, size int64) *Entity {
 	return &Entity{
 		CreatedAt: time.Now().Unix(),
-		Size:      int64(len(value)),
+		Size:      size,
 		Hit:       0,
 		ExpiredAt: 0,
 		Value:     value,
@@ -33,5 +33,5 @@ func NewEntity(value []byte) *Entity {
 }
 
 type Storage interface {
-	Exec(args [][]byte) *protocol.ProtoValue
+	Exec(args *protocol.ProtoValue) *protocol.ProtoValue
 }
