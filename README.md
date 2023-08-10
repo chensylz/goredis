@@ -16,7 +16,7 @@ GoRedis is an open-source project that aims to implement a Redis-like in-memory 
 
 ### Prerequisites
 
-- Go (version 1.19.7)
+- Go (version 1.19.9)
 - [Additional prerequisites...]
 
 ### Installation
