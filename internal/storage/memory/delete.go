@@ -6,11 +6,11 @@ import (
 )
 
 func (m *Memory) delete(args []*protocol.ProtoValue) *protocol.ProtoValue {
-	if len(args) < 2 {
+	if len(args) < 1 {
 		return serrors.NewErrSyntaxIncorrect()
 	}
 	var count int
-	for _, arg := range args[1:] {
+	for _, arg := range args {
 		if _, ok := m.data[arg.Value.(string)]; ok {
 			count++
 		}
