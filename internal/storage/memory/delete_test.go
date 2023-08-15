@@ -6,6 +6,7 @@ import (
 
 	"github.com/chensylz/goredis/internal/protocol"
 	"github.com/chensylz/goredis/internal/storage/memory"
+	"github.com/chensylz/goredis/test"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -30,49 +31,9 @@ func TestDeleteTestSuite(t *testing.T) {
 }
 
 func (s *DeleteTestSuite) TestExpire() {
-	s.db.Exec(&protocol.ProtoValue{
-		Type: protocol.Array,
-		Value: []*protocol.ProtoValue{
-			{
-				Type:  protocol.BulkString,
-				Value: "SET",
-			},
-			{
-				Type:  protocol.BulkString,
-				Value: "key",
-			},
-			{
-				Type:  protocol.BulkString,
-				Value: "value",
-			},
-		},
-	})
-	s.db.Exec(&protocol.ProtoValue{
-		Type: protocol.Array,
-		Value: []*protocol.ProtoValue{
-			{
-				Type:  protocol.BulkString,
-				Value: "DELETE",
-			},
-			{
-				Type:  protocol.BulkString,
-				Value: "key",
-			},
-		},
-	})
-	value := s.db.Exec(&protocol.ProtoValue{
-		Type: protocol.Array,
-		Value: []*protocol.ProtoValue{
-			{
-				Type:  protocol.BulkString,
-				Value: "GET",
-			},
-			{
-				Type:  protocol.BulkString,
-				Value: "key",
-			},
-		},
-	})
+	s.db.Exec(test.SetValue)
+	s.db.Exec(test.DeleteValue)
+	value := s.db.Exec(test.GetValue)
 	s.Equal(protocol.BulkString, value.Type)
 	s.Equal("", value.Value)
 }

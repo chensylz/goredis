@@ -6,6 +6,7 @@ import (
 
 	"github.com/chensylz/goredis/internal/protocol"
 	"github.com/chensylz/goredis/internal/storage/memory"
+	"github.com/chensylz/goredis/test"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -30,39 +31,9 @@ func TestGetSetTestSuite(t *testing.T) {
 }
 
 func (s *GetSetTestSuite) TestGetSet() {
-	setCommand := &protocol.ProtoValue{
-		Type: protocol.Array,
-		Value: []*protocol.ProtoValue{
-			{
-				Type:  protocol.BulkString,
-				Value: "SET",
-			},
-			{
-				Type:  protocol.BulkString,
-				Value: "key",
-			},
-			{
-				Type:  protocol.BulkString,
-				Value: "value",
-			},
-		},
-	}
-	result := s.db.Exec(setCommand)
+	result := s.db.Exec(test.SetValue)
 	s.NotEqual(result.Type, protocol.Error)
-	getCommand := &protocol.ProtoValue{
-		Type: protocol.Array,
-		Value: []*protocol.ProtoValue{
-			{
-				Type:  protocol.BulkString,
-				Value: "GET",
-			},
-			{
-				Type:  protocol.BulkString,
-				Value: "key",
-			},
-		},
-	}
-	result = s.db.Exec(getCommand)
+	result = s.db.Exec(test.GetValue)
 	s.Equal(result.Type, protocol.BulkString)
 	s.Equal(result.Value, "value")
 }
