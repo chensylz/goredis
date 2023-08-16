@@ -229,6 +229,9 @@ func (r *RESP) encodeBulkString(buffer *bytes.Buffer, data *ProtoValue) {
 		str = []byte(data.Value.(string))
 	}
 	length := len(str)
+	if length == 0 {
+		length = -1
+	}
 	buffer.WriteString(fmt.Sprintf("$%d\r\n%s\r\n", length, str))
 }
 
