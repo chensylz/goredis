@@ -13,6 +13,7 @@ const (
 	SET    Func = "SET"
 	EXPIRE Func = "EXPIRE"
 	DELETE Func = "DELETE"
+	PING   Func = "PING"
 )
 
 type Entity struct {

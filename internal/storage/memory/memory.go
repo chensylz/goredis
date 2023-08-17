@@ -38,6 +38,8 @@ func (m *Memory) Exec(commands *protocol.ProtoValue) *protocol.ProtoValue {
 		return m.expire(value[1:])
 	case storage.DELETE:
 		return m.delete(value[1:])
+	case storage.PING:
+		return m.ping()
 	default:
 		return serrors.NewErrSyntaxIncorrect()
 	}

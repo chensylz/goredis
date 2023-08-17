@@ -37,6 +37,13 @@ func NewBulkString(value string) *protocol.ProtoValue {
 	}
 }
 
+func NewSimpleString(value string) *protocol.ProtoValue {
+	return &protocol.ProtoValue{
+		Type:  protocol.SimpleString,
+		Value: value,
+	}
+}
+
 func NewNilBulk() *protocol.ProtoValue {
 	return &protocol.ProtoValue{
 		Type:  protocol.BulkString,
