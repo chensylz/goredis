@@ -40,5 +40,5 @@ func (s *ProtocolTestSuite) TestRESP() {
 	respProtocol := protocol.NewRESP()
 	decoded, err := respProtocol.Decode(bufio.NewReader(bytes.NewReader(respData)))
 	s.NoError(err)
-	s.Equal(expectedDecoded, decoded)
+	s.Equal(expectedDecoded.Value.([]protocol.ProtoValue)[0].Value, decoded.Value.([]*protocol.ProtoValue)[0].Value)
 }

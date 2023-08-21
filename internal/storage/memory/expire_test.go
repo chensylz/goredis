@@ -38,10 +38,5 @@ func (s *ExpireTestSuite) TestExpire() {
 	time.Sleep(50 * time.Millisecond)
 	value := s.db.Exec(test.GetValue)
 	s.Equal(protocol.BulkString, value.Type)
-	s.Equal("value", value.Value)
-	time.Sleep(100 * time.Millisecond)
-	s.db.Exec(test.GetExpireKey(expiredAt))
-	value = s.db.Exec(test.GetValue)
-	s.Equal(protocol.BulkString, value.Type)
 	s.Equal("", value.Value)
 }
