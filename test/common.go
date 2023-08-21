@@ -52,6 +52,16 @@ var (
 			},
 		},
 	}
+
+	PingValue = &protocol.ProtoValue{
+		Type: protocol.Array,
+		Value: []*protocol.ProtoValue{
+			{
+				Type:  protocol.BulkString,
+				Value: "PING",
+			},
+		},
+	}
 )
 
 func GetExpireKey(expireTime int64) *protocol.ProtoValue {
