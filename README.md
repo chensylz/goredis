@@ -35,7 +35,7 @@ GoRedis is an open-source project that aims to implement a Redis-like in-memory 
 We welcome contributions from the community! If you'd like to contribute to GoRedis, please follow these steps:
 
 1. Fork this repository
-2. Create a new branch: `git checkout -b feature/your-feature-name`
+2. Create a new branch: `git checkout -b feature/feature-name`
 3. Make your changes and commit them
 4. Push to your forked repository
 5. Create a Pull Request
