@@ -30,16 +30,18 @@ func (m *Memory) Exec(commands *protocol.ProtoValue) *protocol.ProtoValue {
 		return serrors.NewErrSyntaxIncorrect()
 	}
 	switch storage.Func(value[0].Value.(string)) {
-	case storage.SET:
+	case storage.Set:
 		return m.set(value[1:])
-	case storage.GET:
+	case storage.Get:
 		return m.get(value[1:])
-	case storage.EXPIRE:
+	case storage.Expire:
 		return m.expire(value[1:])
-	case storage.DELETE:
+	case storage.Delete:
 		return m.delete(value[1:])
-	case storage.PING:
+	case storage.Ping:
 		return m.ping()
+	case storage.GetSet:
+		return m.getSet(value[1:])
 	default:
 		return serrors.NewErrSyntaxIncorrect()
 	}

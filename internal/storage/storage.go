@@ -9,11 +9,12 @@ import (
 type Func string
 
 const (
-	GET    Func = "GET"
-	SET    Func = "SET"
-	EXPIRE Func = "EXPIRE"
-	DELETE Func = "DELETE"
-	PING   Func = "PING"
+	Get    Func = "GET"
+	GetSet Func = "GETSET"
+	Set    Func = "SET"
+	Expire Func = "EXPIRE"
+	Delete Func = "DELETE"
+	Ping   Func = "PING"
 )
 
 type Entity struct {
