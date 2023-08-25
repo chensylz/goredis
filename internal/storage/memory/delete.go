@@ -5,7 +5,7 @@ import (
 	"github.com/chensylz/goredis/internal/protocol"
 )
 
-func (m *Memory) delete(args []*protocol.ProtoValue) *protocol.ProtoValue {
+func (m *DB) delete(args []*protocol.ProtoValue) *protocol.ProtoValue {
 	if len(args) < 1 {
 		return response.SyntaxIncorrectErr
 	}

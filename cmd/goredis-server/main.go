@@ -12,9 +12,11 @@ import (
 func main() {
 	logger.SetupLog()
 	conf := config.Setup("redis.conf")
-	s := server.New(*conf, handler.NewServer(
-		protocol.NewRESP(),
-		memory.NewMemory(),
-	))
+	s := server.New(*conf,
+		handler.NewServer(
+			protocol.NewRESP(),
+			memory.New(),
+		),
+	)
 	s.Run()
 }

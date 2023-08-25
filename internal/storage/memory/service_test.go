@@ -14,7 +14,7 @@ type MemoryTestSuite struct {
 	suite.Suite
 	ctx context.Context
 
-	db *memory.Memory
+	db *memory.DB
 }
 
 func (s *MemoryTestSuite) Context() context.Context {

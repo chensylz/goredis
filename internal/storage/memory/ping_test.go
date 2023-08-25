@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/chensylz/goredis/internal/protocol"
-	"github.com/chensylz/goredis/internal/storage/memory"
 	"github.com/chensylz/goredis/test"
 	"github.com/stretchr/testify/suite"
 )
@@ -14,7 +13,7 @@ type PingTestSuite struct {
 	suite.Suite
 	ctx context.Context
 
-	db *memory.Memory
+	db *Memory
 }
 
 func (s *PingTestSuite) Context() context.Context {
@@ -23,7 +22,7 @@ func (s *PingTestSuite) Context() context.Context {
 
 func (s *PingTestSuite) SetupSuite() {
 	s.ctx = context.Background()
-	s.db = memory.NewMemory()
+	s.db = NewMemory()
 }
 
 func TestPingTestSuite(t *testing.T) {

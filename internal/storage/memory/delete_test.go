@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/chensylz/goredis/internal/protocol"
-	"github.com/chensylz/goredis/internal/storage/memory"
 	"github.com/chensylz/goredis/test"
 	"github.com/stretchr/testify/suite"
 )
@@ -14,7 +13,7 @@ type DeleteTestSuite struct {
 	suite.Suite
 	ctx context.Context
 
-	db *memory.Memory
+	db *Memory
 }
 
 func (s *DeleteTestSuite) Context() context.Context {
@@ -23,7 +22,7 @@ func (s *DeleteTestSuite) Context() context.Context {
 
 func (s *DeleteTestSuite) SetupSuite() {
 	s.ctx = context.Background()
-	s.db = memory.NewMemory()
+	s.db = NewMemory()
 }
 
 func TestDeleteTestSuite(t *testing.T) {

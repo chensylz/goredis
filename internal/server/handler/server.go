@@ -20,6 +20,7 @@ type Server struct {
 	Active      atomic.Bool
 	Processor   protocol.Processor
 	Storage     storage.Storage
+	StrCmd      storage.StringCmd
 }
 
 func NewServer(process protocol.Processor, storage storage.Storage) *Server {
@@ -48,12 +49,37 @@ func (s *Server) Handle(ctx context.Context, conn net.Conn) {
 			_ = conn.Close()
 			return
 		default:
-			s.handler(reader, serverConn)
+			s.handler(ctx, reader, serverConn)
 		}
 	}
 }
 
-func (s *Server) handler(reader *bufio.Reader, serverConn *connections.Server) {
+func (s *Server) Exec(ctx context.Context, args *protocol.ProtoValue) *protocol.ProtoValue {
+	value, ok := args.Value.([]*protocol.ProtoValue)
+	if !ok {
+		return response.SyntaxIncorrectErr
+	}
+	cmd := value[0].Value.(string)
+	key := value[1].Value.(string)
+	switch storage.Func(cmd) {
+	case storage.Set:
+		return s.StrCmd.Set(ctx, key, value[2].Value)
+	case storage.Get:
+		return s.StrCmd.Get(ctx, key)
+	case storage.Expire:
+		return m.expire(value[1:])
+	case storage.Delete:
+		return m.delete(value[1:])
+	case storage.Ping:
+		return m.ping()
+	case storage.GetSet:
+		return s.StrCmd.GetSet(ctx, key, value[2].Value)
+	default:
+		return response.SyntaxIncorrectErr
+	}
+}
+
+func (s *Server) handler(ctx context.Context, reader *bufio.Reader, serverConn *connections.Server) {
 	data, err := s.Processor.Decode(reader)
 	if err != nil {
 		if err == io.EOF {
@@ -69,7 +95,7 @@ func (s *Server) handler(reader *bufio.Reader, serverConn *connections.Server) {
 		return
 	}
 	logger.Infof("receive message: %s", data)
-	value := s.Storage.Exec(data)
+	value := s.Exec(ctx, data)
 	result, err := s.Processor.Encode(value)
 	if err != nil {
 		logger.Errorf("encode message error: %s", err)

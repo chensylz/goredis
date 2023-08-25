@@ -5,6 +5,6 @@ import (
 	"github.com/chensylz/goredis/internal/protocol"
 )
 
-func (m *Memory) ping() *protocol.ProtoValue {
+func (m *DB) ping() *protocol.ProtoValue {
 	return response.NewSimpleString("PONG")
 }

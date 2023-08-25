@@ -1,21 +1,35 @@
-package memory
+package commands
 
 import (
+	"context"
+
 	"github.com/chensylz/goredis/internal/global/response"
 	"github.com/chensylz/goredis/internal/protocol"
 	"github.com/chensylz/goredis/internal/storage"
+	"github.com/chensylz/goredis/internal/storage/memory"
 )
 
-func (m *Memory) set(args []*protocol.ProtoValue) *protocol.ProtoValue {
-	if len(args) != 2 {
-		return response.SyntaxIncorrectErr
-	}
-	value := args[1].Value.(string)
-	m.data[args[0].Value.(string)] = storage.NewEntity(value, int64(len(value)))
+type StringCmd struct {
+	db storage.DB
+}
+
+func (s *StringCmd) Get(ctx context.Context, key string) *protocol.ProtoValue {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *StringCmd) Set(ctx context.Context, key string, value interface{}) *protocol.ProtoValue {
+	strValue := value.(string)
+	s.db.Set(ctx, key, strValue)
 	return response.Ok
 }
 
-func (m *Memory) get(args []*protocol.ProtoValue) *protocol.ProtoValue {
+func (s *StringCmd) GetSet(ctx context.Context, key string, value interface{}) *protocol.ProtoValue {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *memory.DB) get(args []*protocol.ProtoValue) *protocol.ProtoValue {
 	if len(args) != 1 {
 		return response.SyntaxIncorrectErr
 	}
@@ -29,7 +43,7 @@ func (m *Memory) get(args []*protocol.ProtoValue) *protocol.ProtoValue {
 	return response.NewBulkString(v.Value.(string))
 }
 
-func (m *Memory) getSet(args []*protocol.ProtoValue) *protocol.ProtoValue {
+func (m *memory.DB) getSet(args []*protocol.ProtoValue) *protocol.ProtoValue {
 	if len(args) != 2 {
 		return response.SyntaxIncorrectErr
 	}

@@ -8,7 +8,7 @@ import (
 	"github.com/chensylz/goredis/internal/protocol"
 )
 
-func (m *Memory) scanExpired() {
+func (m *DB) scanExpired() {
 	m.expireMap.Range(func(key, value interface{}) bool {
 		if value.(int64) < time.Now().Unix() {
 			m.RWMutex.Lock()
@@ -20,7 +20,7 @@ func (m *Memory) scanExpired() {
 	})
 }
 
-func (m *Memory) expire(args []*protocol.ProtoValue) *protocol.ProtoValue {
+func (m *DB) expire(args []*protocol.ProtoValue) *protocol.ProtoValue {
 	if len(args) != 2 {
 		return response.SyntaxIncorrectErr
 	}
