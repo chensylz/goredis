@@ -19,14 +19,19 @@ type Server struct {
 	Connections sync.Map
 	Active      atomic.Bool
 	Processor   protocol.Processor
-	Storage     storage.Storage
+	Storage     storage.DB
 	StrCmd      storage.StringCmd
 }
 
-func NewServer(process protocol.Processor, storage storage.Storage) *Server {
+func NewServer(
+	process protocol.Processor,
+	storage storage.DB,
+	strCmd storage.StringCmd,
+) *Server {
 	return &Server{
 		Processor: process,
 		Storage:   storage,
+		StrCmd:    strCmd,
 	}
 }
 
@@ -67,16 +72,14 @@ func (s *Server) Exec(ctx context.Context, args *protocol.ProtoValue) *protocol.
 	case storage.Get:
 		return s.StrCmd.Get(ctx, key)
 	case storage.Expire:
-		return m.expire(value[1:])
 	case storage.Delete:
-		return m.delete(value[1:])
 	case storage.Ping:
-		return m.ping()
 	case storage.GetSet:
 		return s.StrCmd.GetSet(ctx, key, value[2].Value)
 	default:
 		return response.SyntaxIncorrectErr
 	}
+	return response.SyntaxIncorrectErr
 }
 
 func (s *Server) handler(ctx context.Context, reader *bufio.Reader, serverConn *connections.Server) {

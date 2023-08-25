@@ -1,4 +1,4 @@
-package commands_test
+package stringcmd_test
 
 import (
 	"context"
