@@ -1,13 +1,13 @@
 package memory
 
 import (
-	"github.com/chensylz/goredis/internal/global/serrors"
+	"github.com/chensylz/goredis/internal/global/response"
 	"github.com/chensylz/goredis/internal/protocol"
 )
 
 func (m *Memory) delete(args []*protocol.ProtoValue) *protocol.ProtoValue {
 	if len(args) < 1 {
-		return serrors.NewErrSyntaxIncorrect()
+		return response.SyntaxIncorrectErr
 	}
 	var count int
 	for _, arg := range args {

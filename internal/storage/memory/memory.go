@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chensylz/goredis/internal/global/serrors"
+	"github.com/chensylz/goredis/internal/global/response"
 	"github.com/chensylz/goredis/internal/protocol"
 	"github.com/chensylz/goredis/internal/storage"
 )
@@ -27,7 +27,7 @@ func NewMemory() *Memory {
 func (m *Memory) Exec(commands *protocol.ProtoValue) *protocol.ProtoValue {
 	value, ok := commands.Value.([]*protocol.ProtoValue)
 	if !ok {
-		return serrors.NewErrSyntaxIncorrect()
+		return response.SyntaxIncorrectErr
 	}
 	switch storage.Func(value[0].Value.(string)) {
 	case storage.Set:
@@ -43,6 +43,6 @@ func (m *Memory) Exec(commands *protocol.ProtoValue) *protocol.ProtoValue {
 	case storage.GetSet:
 		return m.getSet(value[1:])
 	default:
-		return serrors.NewErrSyntaxIncorrect()
+		return response.SyntaxIncorrectErr
 	}
 }

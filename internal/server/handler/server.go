@@ -8,7 +8,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/chensylz/goredis/internal/global/serrors"
+	"github.com/chensylz/goredis/internal/global/response"
 	"github.com/chensylz/goredis/internal/logger"
 	"github.com/chensylz/goredis/internal/protocol"
 	"github.com/chensylz/goredis/internal/server/connections"
@@ -61,7 +61,7 @@ func (s *Server) handler(reader *bufio.Reader, serverConn *connections.Server) {
 			s.Connections.Delete(serverConn)
 		} else {
 			logger.Errorf("read message error: %s", err)
-			err = serverConn.Write(s.Processor.MustEncode(serrors.NewErrProtocol()))
+			err = serverConn.Write(s.Processor.MustEncode(response.ProtocolErr))
 			if err != nil {
 				logger.Errorf("conn write error: %s", err)
 			}
@@ -73,7 +73,7 @@ func (s *Server) handler(reader *bufio.Reader, serverConn *connections.Server) {
 	result, err := s.Processor.Encode(value)
 	if err != nil {
 		logger.Errorf("encode message error: %s", err)
-		err = serverConn.Write(s.Processor.MustEncode(serrors.NewErrUnknown()))
+		err = serverConn.Write(s.Processor.MustEncode(response.UnknownErr))
 		if err != nil {
 			logger.Errorf("conn write error: %s", err)
 		}
