@@ -163,7 +163,7 @@ func (s *Server) validArgs(ctx context.Context, args *protocol.ProtoValue) *prot
 		return fullErr
 	}
 	switch storage.Func(value[0].Value.(string)) {
-	case storage.Set:
+	case storage.Set, storage.Expire, storage.GetSet:
 		if len(value) != 3 {
 			return fullErr
 		}
@@ -171,16 +171,10 @@ func (s *Server) validArgs(ctx context.Context, args *protocol.ProtoValue) *prot
 		if len(value) != 2 {
 			return fullErr
 		}
-	case storage.Expire, storage.GetSet:
-		if len(value) != 3 {
-			return fullErr
-		}
 	case storage.Ping:
 		if len(value) != 1 {
 			return fullErr
 		}
-	default:
-		return nil
 	}
 	return nil
 }
