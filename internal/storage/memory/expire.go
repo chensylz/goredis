@@ -41,7 +41,6 @@ func (m *DB) expire(args []*protocol.ProtoValue) *protocol.ProtoValue {
 	if !ok {
 		return response.One
 	}
-	entity.ExpiredAt = expiredAt
 	m.data[key] = entity
 	m.expireMap.Store(key, expiredAt)
 	return response.One

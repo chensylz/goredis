@@ -3,8 +3,6 @@ package storage
 import (
 	"context"
 	"time"
-
-	"github.com/chensylz/goredis/internal/protocol"
 )
 
 type Func string
@@ -37,11 +35,5 @@ func NewEntity(value interface{}, size int) *Entity {
 type DB interface {
 	Get(ctx context.Context, key string) interface{}
 	Set(ctx context.Context, key string, value interface{}) interface{}
-}
-
-type StringCmd interface {
-	Get(ctx context.Context, key string) *protocol.ProtoValue
-	Set(ctx context.Context, key string, value interface{}) *protocol.ProtoValue
-	GetSet(ctx context.Context, key string, value interface{}) *protocol.ProtoValue
-	Delete(ctx context.Context, key string) *protocol.ProtoValue
+	Delete(ctx context.Context, key string) interface{}
 }

@@ -35,6 +35,17 @@ func (m *DB) Set(ctx context.Context, key string, value interface{}) interface{}
 	return value
 }
 
+func (m *DB) Delete(ctx context.Context, key string) interface{} {
+	m.Lock()
+	defer m.Unlock()
+	entity, ok := m.data[key]
+	if !ok {
+		return nil
+	}
+	delete(m.data, key)
+	return entity.Value
+}
+
 func New() *DB {
 	m := &DB{data: make(map[string]*storage.Entity)}
 	go func() {

@@ -5,7 +5,9 @@ import (
 	"testing"
 
 	"github.com/chensylz/goredis/internal/protocol"
-	"github.com/chensylz/goredis/test"
+	"github.com/chensylz/goredis/internal/server/commands"
+	"github.com/chensylz/goredis/internal/server/commands/stringcmd"
+	"github.com/chensylz/goredis/internal/storage/memory"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -13,7 +15,7 @@ type GetSetTestSuite struct {
 	suite.Suite
 	ctx context.Context
 
-	db *Memory
+	cmd commands.StringCmd
 }
 
 func (s *GetSetTestSuite) Context() context.Context {
@@ -22,7 +24,7 @@ func (s *GetSetTestSuite) Context() context.Context {
 
 func (s *GetSetTestSuite) SetupSuite() {
 	s.ctx = context.Background()
-	s.db = NewMemory()
+	s.cmd = stringcmd.New(memory.New())
 }
 
 func TestGetSetTestSuite(t *testing.T) {
@@ -30,9 +32,9 @@ func TestGetSetTestSuite(t *testing.T) {
 }
 
 func (s *GetSetTestSuite) TestGetSet() {
-	result := s.db.Exec(test.SetValue)
+	result := s.cmd.Set(s.ctx, "key", "123")
 	s.NotEqual(result.Type, protocol.Error)
-	result = s.db.Exec(test.GetValue)
+	result = s.cmd.Get(s.ctx, "key")
 	s.Equal(result.Type, protocol.BulkString)
-	s.Equal(result.Value, "value")
+	s.Equal(result.Value, "123")
 }

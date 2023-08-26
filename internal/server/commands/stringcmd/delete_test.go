@@ -5,7 +5,9 @@ import (
 	"testing"
 
 	"github.com/chensylz/goredis/internal/protocol"
-	"github.com/chensylz/goredis/test"
+	"github.com/chensylz/goredis/internal/server/commands"
+	"github.com/chensylz/goredis/internal/server/commands/stringcmd"
+	"github.com/chensylz/goredis/internal/storage/memory"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -13,7 +15,7 @@ type DeleteTestSuite struct {
 	suite.Suite
 	ctx context.Context
 
-	db *Memory
+	cmd commands.StringCmd
 }
 
 func (s *DeleteTestSuite) Context() context.Context {
@@ -22,7 +24,7 @@ func (s *DeleteTestSuite) Context() context.Context {
 
 func (s *DeleteTestSuite) SetupSuite() {
 	s.ctx = context.Background()
-	s.db = NewMemory()
+	s.cmd = stringcmd.New(memory.New())
 }
 
 func TestDeleteTestSuite(t *testing.T) {
@@ -30,9 +32,9 @@ func TestDeleteTestSuite(t *testing.T) {
 }
 
 func (s *DeleteTestSuite) TestExpire() {
-	s.db.Exec(test.SetValue)
-	s.db.Exec(test.DeleteValue)
-	value := s.db.Exec(test.GetValue)
+	s.cmd.Set(s.ctx, "key", "13")
+	s.cmd.Delete(s.ctx, "key")
+	value := s.cmd.Get(s.ctx, "key")
 	s.Equal(protocol.BulkString, value.Type)
 	s.Equal("", value.Value)
 }
