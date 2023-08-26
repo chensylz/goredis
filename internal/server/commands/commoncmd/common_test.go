@@ -1,11 +1,13 @@
-package memory_test
+package commoncmd_test
 
 import (
 	"context"
 	"testing"
 
 	"github.com/chensylz/goredis/internal/protocol"
-	"github.com/chensylz/goredis/test"
+	"github.com/chensylz/goredis/internal/server/commands"
+	"github.com/chensylz/goredis/internal/server/commands/commoncmd"
+	"github.com/chensylz/goredis/internal/storage/memory"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -13,7 +15,7 @@ type PingTestSuite struct {
 	suite.Suite
 	ctx context.Context
 
-	db *Memory
+	cmd commands.CommonCmd
 }
 
 func (s *PingTestSuite) Context() context.Context {
@@ -22,7 +24,7 @@ func (s *PingTestSuite) Context() context.Context {
 
 func (s *PingTestSuite) SetupSuite() {
 	s.ctx = context.Background()
-	s.db = NewMemory()
+	s.cmd = commoncmd.New(memory.New())
 }
 
 func TestPingTestSuite(t *testing.T) {
@@ -30,7 +32,7 @@ func TestPingTestSuite(t *testing.T) {
 }
 
 func (s *PingTestSuite) TestPing() {
-	result := s.db.Exec(test.PingValue)
+	result := s.cmd.Ping(s.ctx)
 	s.Equal(result.Type, protocol.SimpleString)
 	s.Equal(result.Value, "PONG")
 }

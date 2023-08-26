@@ -36,4 +36,6 @@ type DB interface {
 	Get(ctx context.Context, key string) interface{}
 	Set(ctx context.Context, key string, value interface{}) interface{}
 	Delete(ctx context.Context, key string) interface{}
+	SetExpire(ctx context.Context, key string, expiredAt int64)
+	RemoveExpire(ctx context.Context, key string)
 }

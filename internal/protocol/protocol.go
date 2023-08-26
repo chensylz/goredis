@@ -3,6 +3,7 @@ package protocol
 import (
 	"bufio"
 	"fmt"
+	"strings"
 )
 
 type Processor interface {
@@ -16,14 +17,10 @@ type ProtoValue struct {
 	Value interface{}
 }
 
-func (v *ProtoValue) ToCommand() [][]byte {
-	value, ok := v.Value.([]*ProtoValue)
-	if ok {
-		var command [][]byte
-		for _, v := range value {
-			command = append(command, v.ToCommand()...)
-		}
-		return command
+func ProtoValueArrToString(values []*ProtoValue) string {
+	resp := make([]string, len(values))
+	for i, v := range values {
+		resp[i] = fmt.Sprintf("%v", v.Value)
 	}
-	return [][]byte{[]byte(fmt.Sprintf("%s", v.Value))}
+	return strings.Join(resp, " ")
 }

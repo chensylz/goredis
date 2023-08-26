@@ -11,7 +11,7 @@ import (
 type DB struct {
 	data      map[string]*storage.Entity
 	expireMap sync.Map
-	sync.RWMutex
+	sync.Mutex
 }
 
 func (m *DB) Get(ctx context.Context, key string) interface{} {
@@ -46,11 +46,31 @@ func (m *DB) Delete(ctx context.Context, key string) interface{} {
 	return entity.Value
 }
 
+func (m *DB) SetExpire(ctx context.Context, key string, expiredAt int64) {
+	m.expireMap.Store(key, expiredAt)
+}
+
+func (m *DB) RemoveExpire(ctx context.Context, key string) {
+	m.expireMap.Delete(key)
+}
+
+func (m *DB) scanExpired() {
+	m.expireMap.Range(func(key, value interface{}) bool {
+		if value.(int64) <= time.Now().Unix() {
+			m.Lock()
+			delete(m.data, key.(string))
+			m.Unlock()
+			m.expireMap.Delete(key)
+		}
+		return true
+	})
+}
+
 func New() *DB {
 	m := &DB{data: make(map[string]*storage.Entity)}
 	go func() {
 		m.scanExpired()
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(50 * time.Millisecond)
 	}()
 	return m
 }

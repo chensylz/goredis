@@ -2,10 +2,14 @@ package response
 
 import "github.com/chensylz/goredis/internal/protocol"
 
+const (
+	SyntaxIncorrect = "Syntax incorrect"
+)
+
 var (
 	ProtocolErr        = NewErr("Protocol content error")
 	UnknownErr         = NewErr("Unknown error")
-	SyntaxIncorrectErr = NewErr("Syntax incorrect")
+	SyntaxIncorrectErr = NewErr(SyntaxIncorrect)
 
 	Ok      = NewSimpleString("Ok")
 	NilBulk = NewBulkString("")
@@ -37,12 +41,5 @@ func NewBulkString(value string) *protocol.ProtoValue {
 	return &protocol.ProtoValue{
 		Type:  protocol.BulkString,
 		Value: value,
-	}
-}
-
-func NewErrKeyNotFound() *protocol.ProtoValue {
-	return &protocol.ProtoValue{
-		Type:  protocol.Error,
-		Value: "ERR Key not found",
 	}
 }
