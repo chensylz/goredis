@@ -4,9 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/chensylz/goredis/internal/protocol"
 	"github.com/chensylz/goredis/internal/storage/memory"
-	"github.com/chensylz/goredis/test"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -23,7 +21,7 @@ func (s *MemoryTestSuite) Context() context.Context {
 
 func (s *MemoryTestSuite) SetupSuite() {
 	s.ctx = context.Background()
-	s.db = memory.NewMemory()
+	s.db = memory.New()
 }
 
 func TestMemoryTestSuite(t *testing.T) {
@@ -31,9 +29,8 @@ func TestMemoryTestSuite(t *testing.T) {
 }
 
 func (s *MemoryTestSuite) TestMemory() {
-	result := s.db.Exec(test.SetValue)
-	s.NotEqual(result.Type, protocol.Error)
-	result = s.db.Exec(test.GetValue)
-	s.Equal(result.Type, protocol.BulkString)
-	s.Equal(result.Value, "value")
+	result := s.db.Set(s.ctx, "key", "value")
+	s.NotNil(result)
+	result = s.db.Get(s.ctx, "key")
+	s.Equal("value", result)
 }
