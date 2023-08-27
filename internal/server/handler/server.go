@@ -89,6 +89,8 @@ func (s *Server) Exec(ctx context.Context, args *protocol.ProtoValue) *protocol.
 		return s.StrCmd.Delete(ctx, key)
 	case storage.Ping:
 		return s.ComCmd.Ping(ctx)
+	case storage.Echo:
+		return s.ComCmd.Echo(ctx, key)
 	case storage.GetSet:
 		return s.StrCmd.GetSet(ctx, key, value[2].Value)
 	default:

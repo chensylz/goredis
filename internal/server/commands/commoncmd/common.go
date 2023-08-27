@@ -16,6 +16,10 @@ func (c *Cmd) Ping(ctx context.Context) *protocol.ProtoValue {
 	return response.NewSimpleString("PONG")
 }
 
+func (c *Cmd) Echo(ctx context.Context, value string) *protocol.ProtoValue {
+	return response.NewBulkString(value)
+}
+
 func New(db storage.DB) *Cmd {
 	return &Cmd{db: db}
 }
