@@ -67,7 +67,7 @@ func (s *Server) Handle(ctx context.Context, conn net.Conn) {
 	}
 }
 
-func (s *Server) Exec(ctx context.Context, args *protocol.ProtoValue) *protocol.ProtoValue {
+func (s *Server) Exec(ctx context.Context, args *protocol.ProtoValue, conn *connections.Server) *protocol.ProtoValue {
 	if err := s.validArgs(ctx, args); err != nil {
 		return err
 	}
@@ -87,12 +87,16 @@ func (s *Server) Exec(ctx context.Context, args *protocol.ProtoValue) *protocol.
 		return s.ExpCmd.Expire(ctx, key, expiredAt.(int64))
 	case storage.Delete:
 		return s.StrCmd.Delete(ctx, key)
+	case storage.GetSet:
+		return s.StrCmd.GetSet(ctx, key, value[2].Value)
+
+	case storage.Select:
+		return s.ComCmd.Select(ctx, key, conn)
+
 	case storage.Ping:
 		return s.ComCmd.Ping(ctx)
 	case storage.Echo:
 		return s.ComCmd.Echo(ctx, key)
-	case storage.GetSet:
-		return s.StrCmd.GetSet(ctx, key, value[2].Value)
 	default:
 		return response.SyntaxIncorrectErr
 	}
@@ -114,7 +118,7 @@ func (s *Server) handler(ctx context.Context, reader *bufio.Reader, serverConn *
 		return
 	}
 	logger.Infof("receive message: %s", data)
-	value := s.Exec(ctx, data)
+	value := s.Exec(ctx, data, serverConn)
 	result, err := s.Processor.Encode(value)
 	if err != nil {
 		logger.Errorf("encode message error: %s", err)

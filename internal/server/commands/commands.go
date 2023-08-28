@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/chensylz/goredis/internal/protocol"
+	"github.com/chensylz/goredis/internal/server/connections"
 )
 
 type StringCmd interface {
@@ -20,4 +21,5 @@ type ExpireCmd interface {
 type CommonCmd interface {
 	Ping(ctx context.Context) *protocol.ProtoValue
 	Echo(ctx context.Context, value string) *protocol.ProtoValue
+	Select(ctx context.Context, db string, conn *connections.Server) *protocol.ProtoValue
 }

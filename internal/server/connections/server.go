@@ -4,6 +4,7 @@ import "net"
 
 type Server struct {
 	Conn net.Conn
+	db   uint8
 }
 
 func NewServer(conn net.Conn) *Server {
@@ -16,6 +17,10 @@ func (s *Server) Close() error {
 
 func (s *Server) Address() string {
 	return s.Conn.RemoteAddr().String()
+}
+
+func (s *Server) SetDB(db uint8) {
+	s.db = db
 }
 
 func (s *Server) Write(b []byte) error {
