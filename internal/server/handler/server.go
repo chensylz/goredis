@@ -12,34 +12,25 @@ import (
 	"github.com/chensylz/goredis/internal/global/response"
 	"github.com/chensylz/goredis/internal/logger"
 	"github.com/chensylz/goredis/internal/protocol"
-	"github.com/chensylz/goredis/internal/server/commands"
 	"github.com/chensylz/goredis/internal/server/connections"
 	"github.com/chensylz/goredis/internal/storage"
+	"github.com/chensylz/goredis/internal/storage/databse"
 )
 
 type Server struct {
 	Connections sync.Map
 	Active      atomic.Bool
 	Processor   protocol.Processor
-	Storage     storage.DB
-	StrCmd      commands.StringCmd
-	ComCmd      commands.CommonCmd
-	ExpCmd      commands.ExpireCmd
+	DBs         *databse.Database
 }
 
 func NewServer(
 	process protocol.Processor,
-	storage storage.DB,
-	comCmd commands.CommonCmd,
-	strCmd commands.StringCmd,
-	expCmd commands.ExpireCmd,
+	storage *databse.Database,
 ) *Server {
 	return &Server{
 		Processor: process,
-		Storage:   storage,
-		StrCmd:    strCmd,
-		ExpCmd:    expCmd,
-		ComCmd:    comCmd,
+		DBs:       storage,
 	}
 }
 
@@ -48,7 +39,7 @@ func (s *Server) Handle(ctx context.Context, conn net.Conn) {
 		_ = conn.Close()
 		return
 	}
-	serverConn := connections.NewServer(conn)
+	serverConn := connections.NewServer(conn, s.DBs)
 	s.Connections.Store(serverConn, struct{}{})
 	logger.Infof("client %s connected", serverConn.Address())
 	reader := bufio.NewReader(conn)
@@ -73,30 +64,31 @@ func (s *Server) Exec(ctx context.Context, args *protocol.ProtoValue, conn *conn
 	}
 	value := args.Value.([]*protocol.ProtoValue)
 	cmd := value[0].Value.(string)
-	key := value[1].Value.(string)
+	arg := value[1].Value.(string)
 	switch storage.Func(cmd) {
 	case storage.Set:
-		return s.StrCmd.Set(ctx, key, value[2].Value)
+		return conn.StrCmd.Set(ctx, arg, value[2].Value)
 	case storage.Get:
-		return s.StrCmd.Get(ctx, key)
+		return conn.StrCmd.Get(ctx, arg)
 	case storage.Expire:
 		expiredAt, err := s.parseArgs(ctx, storage.Func(cmd), value[2])
 		if err != nil {
 			return err
 		}
-		return s.ExpCmd.Expire(ctx, key, expiredAt.(int64))
+		return conn.ExpCmd.Expire(ctx, arg, expiredAt.(int64))
 	case storage.Delete:
-		return s.StrCmd.Delete(ctx, key)
+		return conn.StrCmd.Delete(ctx, arg)
 	case storage.GetSet:
-		return s.StrCmd.GetSet(ctx, key, value[2].Value)
+		return conn.StrCmd.GetSet(ctx, arg, value[2].Value)
 
 	case storage.Select:
-		return s.ComCmd.Select(ctx, key, conn)
+		conn.Select(arg)
+		return response.Ok
 
 	case storage.Ping:
-		return s.ComCmd.Ping(ctx)
+		return conn.ComCmd.Ping(ctx)
 	case storage.Echo:
-		return s.ComCmd.Echo(ctx, key)
+		return conn.ComCmd.Echo(ctx, arg)
 	default:
 		return response.SyntaxIncorrectErr
 	}

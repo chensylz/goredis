@@ -24,7 +24,7 @@ func (s *PingTestSuite) Context() context.Context {
 
 func (s *PingTestSuite) SetupSuite() {
 	s.ctx = context.Background()
-	s.cmd = commoncmd.New(memory.New())
+	s.cmd = commoncmd.New(memory.NewSyncDict(0))
 }
 
 func TestPingTestSuite(t *testing.T) {

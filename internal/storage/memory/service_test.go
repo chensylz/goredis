@@ -12,7 +12,7 @@ type MemoryTestSuite struct {
 	suite.Suite
 	ctx context.Context
 
-	db *memory.DB
+	db *memory.Dict
 }
 
 func (s *MemoryTestSuite) Context() context.Context {
@@ -21,7 +21,7 @@ func (s *MemoryTestSuite) Context() context.Context {
 
 func (s *MemoryTestSuite) SetupSuite() {
 	s.ctx = context.Background()
-	s.db = memory.New()
+	s.db = memory.NewSyncDict(0)
 }
 
 func TestMemoryTestSuite(t *testing.T) {

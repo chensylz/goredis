@@ -27,7 +27,7 @@ func (s *ExpireTestSuite) Context() context.Context {
 
 func (s *ExpireTestSuite) SetupSuite() {
 	s.ctx = context.Background()
-	db := memory.New()
+	db := memory.NewSyncDict(0)
 	s.cmd = expirecmd.New(db)
 	s.str = stringcmd.New(db)
 }

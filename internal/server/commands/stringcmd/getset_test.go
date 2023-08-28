@@ -24,7 +24,7 @@ func (s *GetSetTestSuite) Context() context.Context {
 
 func (s *GetSetTestSuite) SetupSuite() {
 	s.ctx = context.Background()
-	s.cmd = stringcmd.New(memory.New())
+	s.cmd = stringcmd.New(memory.NewSyncDict(0))
 }
 
 func TestGetSetTestSuite(t *testing.T) {

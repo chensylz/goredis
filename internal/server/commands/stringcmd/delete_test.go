@@ -24,7 +24,7 @@ func (s *DeleteTestSuite) Context() context.Context {
 
 func (s *DeleteTestSuite) SetupSuite() {
 	s.ctx = context.Background()
-	s.cmd = stringcmd.New(memory.New())
+	s.cmd = stringcmd.New(memory.NewSyncDict(0))
 }
 
 func TestDeleteTestSuite(t *testing.T) {

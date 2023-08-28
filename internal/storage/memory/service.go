@@ -8,13 +8,14 @@ import (
 	"github.com/chensylz/goredis/internal/storage"
 )
 
-type DB struct {
+type Dict struct {
+	index     int
 	data      map[string]*storage.Entity
 	expireMap sync.Map
 	sync.Mutex
 }
 
-func (m *DB) Get(ctx context.Context, key string) interface{} {
+func (m *Dict) Get(ctx context.Context, key string) interface{} {
 	entity, ok := m.data[key]
 	if !ok {
 		return nil
@@ -23,7 +24,7 @@ func (m *DB) Get(ctx context.Context, key string) interface{} {
 	return entity.Value
 }
 
-func (m *DB) Set(ctx context.Context, key string, value interface{}) interface{} {
+func (m *Dict) Set(ctx context.Context, key string, value interface{}) interface{} {
 	m.Lock()
 	defer m.Unlock()
 	entity := storage.NewEntity(value, 0)
@@ -35,7 +36,7 @@ func (m *DB) Set(ctx context.Context, key string, value interface{}) interface{}
 	return value
 }
 
-func (m *DB) Delete(ctx context.Context, key string) interface{} {
+func (m *Dict) Delete(ctx context.Context, key string) interface{} {
 	m.Lock()
 	defer m.Unlock()
 	entity, ok := m.data[key]
@@ -46,15 +47,15 @@ func (m *DB) Delete(ctx context.Context, key string) interface{} {
 	return entity.Value
 }
 
-func (m *DB) SetExpire(ctx context.Context, key string, expiredAt int64) {
+func (m *Dict) SetExpire(ctx context.Context, key string, expiredAt int64) {
 	m.expireMap.Store(key, expiredAt)
 }
 
-func (m *DB) RemoveExpire(ctx context.Context, key string) {
+func (m *Dict) RemoveExpire(ctx context.Context, key string) {
 	m.expireMap.Delete(key)
 }
 
-func (m *DB) scanExpired() {
+func (m *Dict) scanExpired() {
 	m.expireMap.Range(func(key, value interface{}) bool {
 		if value.(int64) <= time.Now().Unix() {
 			m.Lock()
@@ -66,8 +67,8 @@ func (m *DB) scanExpired() {
 	})
 }
 
-func New() *DB {
-	m := &DB{data: make(map[string]*storage.Entity)}
+func NewSyncDict(index int) *Dict {
+	m := &Dict{data: make(map[string]*storage.Entity), index: index}
 	go func() {
 		m.scanExpired()
 		time.Sleep(50 * time.Millisecond)
