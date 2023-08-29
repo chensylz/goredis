@@ -4,11 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
+
 	"github.com/chensylz/goredis/internal/protocol"
 	"github.com/chensylz/goredis/internal/server/commands"
 	"github.com/chensylz/goredis/internal/server/commands/commoncmd"
 	"github.com/chensylz/goredis/internal/storage/memory"
-	"github.com/stretchr/testify/suite"
 )
 
 type PingTestSuite struct {
