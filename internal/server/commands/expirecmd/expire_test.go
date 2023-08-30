@@ -5,12 +5,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/suite"
+
 	"github.com/chensylz/goredis/internal/protocol"
 	"github.com/chensylz/goredis/internal/server/commands"
 	"github.com/chensylz/goredis/internal/server/commands/expirecmd"
 	"github.com/chensylz/goredis/internal/server/commands/stringcmd"
 	"github.com/chensylz/goredis/internal/storage/memory"
-	"github.com/stretchr/testify/suite"
 )
 
 type ExpireTestSuite struct {
