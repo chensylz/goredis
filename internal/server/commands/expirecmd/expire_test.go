@@ -18,7 +18,7 @@ type ExpireTestSuite struct {
 	suite.Suite
 	ctx context.Context
 
-	cmd commands.ExpireCmd
+	cmd commands.KeyCmd
 	str commands.StringCmd
 }
 

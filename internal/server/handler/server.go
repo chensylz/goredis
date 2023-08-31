@@ -75,7 +75,7 @@ func (s *Server) Exec(ctx context.Context, args *protocol.ProtoValue, conn *conn
 		if err != nil {
 			return err
 		}
-		return conn.ExpCmd.Expire(ctx, arg, expiredAt.(int64))
+		return conn.KeyCmd.Expire(ctx, arg, expiredAt.(int64))
 	case storage.Delete:
 		return conn.StrCmd.Delete(ctx, arg)
 	case storage.GetSet:

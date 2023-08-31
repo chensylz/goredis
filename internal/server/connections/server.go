@@ -20,7 +20,7 @@ type Server struct {
 
 	StrCmd commands.StringCmd
 	ComCmd commands.CommonCmd
-	ExpCmd commands.ExpireCmd
+	KeyCmd commands.KeyCmd
 }
 
 func NewServer(conn net.Conn, dbs *databse.Database) *Server {
@@ -32,7 +32,7 @@ func NewServer(conn net.Conn, dbs *databse.Database) *Server {
 		dbIndex:   0,
 		StrCmd:    stringcmd.New(cDB),
 		ComCmd:    commoncmd.New(cDB),
-		ExpCmd:    expirecmd.New(cDB),
+		KeyCmd:    expirecmd.New(cDB),
 	}
 }
 
@@ -54,7 +54,7 @@ func (s *Server) Select(arg string) {
 
 	s.StrCmd = stringcmd.New(s.currentDB)
 	s.ComCmd = commoncmd.New(s.currentDB)
-	s.ExpCmd = expirecmd.New(s.currentDB)
+	s.KeyCmd = expirecmd.New(s.currentDB)
 }
 
 func (s *Server) Write(b []byte) error {

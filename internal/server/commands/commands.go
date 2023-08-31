@@ -13,8 +13,9 @@ type StringCmd interface {
 	Delete(ctx context.Context, key string) *protocol.ProtoValue
 }
 
-type ExpireCmd interface {
+type KeyCmd interface {
 	Expire(ctx context.Context, key string, expiredAt int64) *protocol.ProtoValue
+	Exists(ctx context.Context, key string) *protocol.ProtoValue
 }
 
 type CommonCmd interface {

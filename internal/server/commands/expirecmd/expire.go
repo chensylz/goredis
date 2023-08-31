@@ -26,3 +26,8 @@ func (s *Cmd) Expire(ctx context.Context, key string, expiredAt int64) *protocol
 	s.db.SetExpire(ctx, key, expiredAt)
 	return response.One
 }
+
+func (s *Cmd) Exists(ctx context.Context, key string) *protocol.ProtoValue {
+	//TODO implement me
+	panic("implement me")
+}
