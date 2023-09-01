@@ -28,6 +28,9 @@ func (s *Cmd) Expire(ctx context.Context, key string, expiredAt int64) *protocol
 }
 
 func (s *Cmd) Exists(ctx context.Context, key string) *protocol.ProtoValue {
-	//TODO implement me
-	panic("implement me")
+	resp := response.NewInter(0)
+	if s.db.Exists(ctx, key) {
+		resp.Value = 1
+	}
+	return resp
 }

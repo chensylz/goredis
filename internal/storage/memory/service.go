@@ -55,6 +55,11 @@ func (m *Dict) RemoveExpire(ctx context.Context, key string) {
 	m.expireMap.Delete(key)
 }
 
+func (m *Dict) Exists(ctx context.Context, key string) bool {
+	_, ok := m.data[key]
+	return ok
+}
+
 func (m *Dict) scanExpired() {
 	m.expireMap.Range(func(key, value interface{}) bool {
 		if value.(int64) <= time.Now().Unix() {

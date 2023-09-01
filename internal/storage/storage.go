@@ -42,4 +42,5 @@ type DB interface {
 	Delete(ctx context.Context, key string) interface{}
 	SetExpire(ctx context.Context, key string, expiredAt int64)
 	RemoveExpire(ctx context.Context, key string)
+	Exists(ctx context.Context, key string) bool
 }
