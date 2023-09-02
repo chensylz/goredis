@@ -47,3 +47,12 @@ func (s *ExpireTestSuite) TestExpire() {
 	s.Equal(protocol.BulkString, v.Type)
 	s.Equal("", v.Value)
 }
+
+func (s *ExpireTestSuite) TestExists() {
+	key := "key"
+	value := "value"
+	s.str.Set(s.ctx, key, value)
+	v := s.cmd.Exists(s.ctx, key)
+	s.Equal(protocol.Integer, v.Type)
+	s.Equal(1, v.Value)
+}
