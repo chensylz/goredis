@@ -6,7 +6,7 @@ import (
 
 	"github.com/chensylz/goredis/internal/server/commands"
 	"github.com/chensylz/goredis/internal/server/commands/commoncmd"
-	"github.com/chensylz/goredis/internal/server/commands/expirecmd"
+	"github.com/chensylz/goredis/internal/server/commands/keycmd"
 	"github.com/chensylz/goredis/internal/server/commands/stringcmd"
 	"github.com/chensylz/goredis/internal/storage"
 	"github.com/chensylz/goredis/internal/storage/databse"
@@ -32,7 +32,7 @@ func NewServer(conn net.Conn, dbs *databse.Database) *Server {
 		dbIndex:   0,
 		StrCmd:    stringcmd.New(cDB),
 		ComCmd:    commoncmd.New(cDB),
-		KeyCmd:    expirecmd.New(cDB),
+		KeyCmd:    keycmd.New(cDB),
 	}
 }
 
@@ -54,7 +54,7 @@ func (s *Server) Select(arg string) {
 
 	s.StrCmd = stringcmd.New(s.currentDB)
 	s.ComCmd = commoncmd.New(s.currentDB)
-	s.KeyCmd = expirecmd.New(s.currentDB)
+	s.KeyCmd = keycmd.New(s.currentDB)
 }
 
 func (s *Server) Write(b []byte) error {

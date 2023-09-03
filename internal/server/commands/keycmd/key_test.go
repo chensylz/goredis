@@ -1,4 +1,4 @@
-package expirecmd_test
+package keycmd_test
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 
 	"github.com/chensylz/goredis/internal/protocol"
 	"github.com/chensylz/goredis/internal/server/commands"
-	"github.com/chensylz/goredis/internal/server/commands/expirecmd"
+	"github.com/chensylz/goredis/internal/server/commands/keycmd"
 	"github.com/chensylz/goredis/internal/server/commands/stringcmd"
 	"github.com/chensylz/goredis/internal/storage/memory"
 )
@@ -29,7 +29,7 @@ func (s *ExpireTestSuite) Context() context.Context {
 func (s *ExpireTestSuite) SetupSuite() {
 	s.ctx = context.Background()
 	db := memory.NewSyncDict(0)
-	s.cmd = expirecmd.New(db)
+	s.cmd = keycmd.New(db)
 	s.str = stringcmd.New(db)
 }
 

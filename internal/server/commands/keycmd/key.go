@@ -1,4 +1,4 @@
-package expirecmd
+package keycmd
 
 import (
 	"context"
