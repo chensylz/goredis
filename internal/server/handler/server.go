@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -64,6 +65,7 @@ func (s *Server) Exec(ctx context.Context, args *protocol.ProtoValue, conn *conn
 	}
 	value := args.Value.([]*protocol.ProtoValue)
 	cmd := value[0].Value.(string)
+	cmd = strings.ToUpper(cmd)
 	arg := value[1].Value.(string)
 	switch storage.Func(cmd) {
 	case storage.Set:
