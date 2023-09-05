@@ -38,3 +38,11 @@ func (s *Cmd) GetSet(ctx context.Context, key string, value interface{}) *protoc
 	}
 	return response.NewBulkString(str.(string))
 }
+
+func (s *Cmd) GetDel(ctx context.Context, key string) *protocol.ProtoValue {
+	str := s.db.Get(ctx, key)
+	if str != nil {
+		s.db.Delete(ctx, key)
+	}
+	return response.NewBulkString(str.(string))
+}
