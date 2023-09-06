@@ -39,3 +39,14 @@ func (s *GetSetTestSuite) TestGetSet() {
 	s.Equal(result.Type, protocol.BulkString)
 	s.Equal(result.Value, "123")
 }
+
+func (s *GetSetTestSuite) TestGetDel() {
+	result := s.cmd.Set(s.ctx, "key", "123")
+	s.NotEqual(result.Type, protocol.Error)
+	result = s.cmd.GetDel(s.ctx, "key")
+	s.Equal(result.Type, protocol.BulkString)
+	s.Equal(result.Value, "123")
+	result = s.cmd.Get(s.ctx, "key")
+	s.Equal(result.Type, protocol.BulkString)
+	s.Equal(result.Value, "")
+}
