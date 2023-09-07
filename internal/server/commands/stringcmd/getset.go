@@ -2,6 +2,7 @@ package stringcmd
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/chensylz/goredis/internal/global/response"
 	"github.com/chensylz/goredis/internal/protocol"
@@ -45,4 +46,18 @@ func (s *Cmd) GetDel(ctx context.Context, key string) *protocol.ProtoValue {
 		s.db.Delete(ctx, key)
 	}
 	return response.NewBulkString(str.(string))
+}
+
+func (s *Cmd) Incr(ctx context.Context, key string) *protocol.ProtoValue {
+	value := s.db.Get(ctx, key)
+	if value == nil {
+		s.db.Set(ctx, key, "1")
+		return response.One
+	}
+	i, err := strconv.ParseInt(value.(string), 10, 64)
+	if err != nil {
+		return response.NewErr("don't support incr value")
+	}
+	s.db.Set(ctx, key, strconv.FormatInt(i+1, 10))
+	return response.NewInter(value.(int64) + 1)
 }

@@ -12,6 +12,7 @@ type StringCmd interface {
 	GetSet(ctx context.Context, key string, value interface{}) *protocol.ProtoValue
 	Delete(ctx context.Context, key string) *protocol.ProtoValue
 	GetDel(ctx context.Context, key string) *protocol.ProtoValue
+	Incr(ctx context.Context, key string) *protocol.ProtoValue
 }
 
 type KeyCmd interface {
