@@ -50,3 +50,9 @@ func (s *GetSetTestSuite) TestGetDel() {
 	s.Equal(result.Type, protocol.BulkString)
 	s.Equal(result.Value, "")
 }
+
+func (s *GetSetTestSuite) TestGetIncr() {
+	result := s.cmd.Incr(s.ctx, "key")
+	s.Equal(result.Type, protocol.Integer)
+	s.Equal(result.Value, int64(1))
+}
