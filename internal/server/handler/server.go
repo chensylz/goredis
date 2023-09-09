@@ -162,12 +162,12 @@ func (s *Server) validArgs(ctx context.Context, args *protocol.ProtoValue) *prot
 	if len(value) < 2 {
 		return fullErr
 	}
-	switch storage.Func(value[0].Value.(string)) {
+	switch storage.Func(strings.ToUpper(value[0].Value.(string))) {
 	case storage.Set, storage.Expire, storage.GetSet:
 		if len(value) != 3 {
 			return fullErr
 		}
-	case storage.Get, storage.Delete:
+	case storage.Get, storage.Delete, storage.Incr:
 		if len(value) != 2 {
 			return fullErr
 		}

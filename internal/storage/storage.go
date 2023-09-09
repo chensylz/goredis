@@ -13,6 +13,7 @@ const (
 	Set    Func = "SET"
 	Expire Func = "EXPIRE"
 	Delete Func = "DELETE"
+	Incr   Func = "INCR"
 
 	Ping Func = "PING"
 	Echo Func = "ECHO"
