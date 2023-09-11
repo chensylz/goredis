@@ -55,4 +55,7 @@ func (s *GetSetTestSuite) TestGetIncr() {
 	result := s.cmd.Incr(s.ctx, "key")
 	s.Equal(result.Type, protocol.Integer)
 	s.Equal(result.Value, int64(1))
+	s.cmd.Set(s.ctx, "key1", "xxx")
+	result = s.cmd.Incr(s.ctx, "key1")
+	s.Equal(result.Type, protocol.Error)
 }
