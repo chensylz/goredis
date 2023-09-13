@@ -91,6 +91,8 @@ func (s *Server) Exec(ctx context.Context, args *protocol.ProtoValue, conn *conn
 		return conn.ComCmd.Ping(ctx)
 	case storage.Echo:
 		return conn.ComCmd.Echo(ctx, arg)
+	case storage.Info:
+		return conn.ComCmd.Info(ctx, arg)
 	default:
 		return response.SyntaxIncorrectErr
 	}

@@ -23,4 +23,5 @@ type KeyCmd interface {
 type CommonCmd interface {
 	Ping(ctx context.Context) *protocol.ProtoValue
 	Echo(ctx context.Context, value string) *protocol.ProtoValue
+	Info(ctx context.Context, value string) *protocol.ProtoValue
 }

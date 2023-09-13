@@ -17,6 +17,7 @@ const (
 
 	Ping Func = "PING"
 	Echo Func = "ECHO"
+	Info Func = "INFO"
 
 	Select Func = "SELECT"
 )
