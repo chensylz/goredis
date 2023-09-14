@@ -31,6 +31,9 @@ func (r *RESP) Decode(reader *bufio.Reader) (val *ProtoValue, err error) {
 	if err != nil {
 		return nil, err
 	}
+	if firstByte == ' ' {
+		return nil, nil
+	}
 
 	switch firstByte {
 	case '+': // 单行字符串

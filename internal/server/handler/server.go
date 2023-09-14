@@ -113,6 +113,9 @@ func (s *Server) handler(ctx context.Context, reader *bufio.Reader, serverConn *
 		}
 		return
 	}
+	if data == nil {
+		return
+	}
 	logger.Infof("receive message: %s", data)
 	value := s.Exec(ctx, data, serverConn)
 	result, err := s.Processor.Encode(value)
