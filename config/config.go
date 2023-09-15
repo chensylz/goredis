@@ -4,9 +4,8 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"strconv"
 	"strings"
-
-	"github.com/jinzhu/copier"
 )
 
 type Config struct {
@@ -23,9 +22,8 @@ func Setup(filePath string) *Config {
 	if err != nil {
 		log.Panicf("load local config error: %v", err)
 	}
-	if err = copier.Copy(&config, properties); err != nil {
-		log.Panicf("load local config error: %v", err)
-	}
+	config.Bind = properties["bind"]
+	config.Port, _ = strconv.Atoi(properties["port"])
 	return config
 }
 

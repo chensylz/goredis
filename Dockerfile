@@ -17,7 +17,7 @@ RUN go env -w GO111MODULE=on \
    && go env -w CGO_ENABLED=0 \
    && go env \
    && go mod tidy \
-   && go build -o main .
+   && go build -o main ./cmd/goredis-server/
 
 
 FROM alpine:latest
