@@ -25,3 +25,11 @@ type CommonCmd interface {
 	Echo(ctx context.Context, value string) *protocol.ProtoValue
 	Info(ctx context.Context, value string) *protocol.ProtoValue
 }
+
+type SetCmd interface {
+	HGet(ctx context.Context, key string, field string) *protocol.ProtoValue
+	HSet(ctx context.Context, key string, field string, value interface{}) *protocol.ProtoValue
+	HGetAll(ctx context.Context, key string) *protocol.ProtoValue
+	HDel(ctx context.Context, key string, field string) *protocol.ProtoValue
+	HExists(ctx context.Context, key string, field string) *protocol.ProtoValue
+}
