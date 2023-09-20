@@ -7,6 +7,7 @@ import (
 	"github.com/chensylz/goredis/internal/server/commands"
 	"github.com/chensylz/goredis/internal/server/commands/commoncmd"
 	"github.com/chensylz/goredis/internal/server/commands/keycmd"
+	"github.com/chensylz/goredis/internal/server/commands/setcmd"
 	"github.com/chensylz/goredis/internal/server/commands/stringcmd"
 	"github.com/chensylz/goredis/internal/storage"
 	"github.com/chensylz/goredis/internal/storage/databse"
@@ -21,6 +22,7 @@ type Server struct {
 	StrCmd commands.StringCmd
 	ComCmd commands.CommonCmd
 	KeyCmd commands.KeyCmd
+	SetCmd commands.SetCmd
 }
 
 func NewServer(conn net.Conn, dbs *databse.Database) *Server {
@@ -33,6 +35,7 @@ func NewServer(conn net.Conn, dbs *databse.Database) *Server {
 		StrCmd:    stringcmd.New(cDB),
 		ComCmd:    commoncmd.New(cDB),
 		KeyCmd:    keycmd.New(cDB),
+		SetCmd:    setcmd.New(cDB),
 	}
 }
 
@@ -55,6 +58,7 @@ func (s *Server) Select(arg string) {
 	s.StrCmd = stringcmd.New(s.currentDB)
 	s.ComCmd = commoncmd.New(s.currentDB)
 	s.KeyCmd = keycmd.New(s.currentDB)
+	s.SetCmd = setcmd.New(s.currentDB)
 }
 
 func (s *Server) Write(b []byte) error {
