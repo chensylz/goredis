@@ -93,6 +93,14 @@ func (s *Server) Exec(ctx context.Context, args *protocol.ProtoValue, conn *conn
 		return conn.ComCmd.Echo(ctx, arg)
 	case storage.Info:
 		return conn.ComCmd.Info(ctx, arg)
+
+	case storage.HSet:
+		return conn.SetCmd.HSet(ctx, arg, value[2].Value.(string), value[3].Value)
+	case storage.HGET:
+		return conn.SetCmd.HGet(ctx, arg, value[2].Value.(string))
+	case storage.HGETALL:
+		return conn.SetCmd.HGetAll(ctx, arg)
+
 	default:
 		return response.SyntaxIncorrectErr
 	}

@@ -20,6 +20,10 @@ const (
 	Info Func = "INFO"
 
 	Select Func = "SELECT"
+
+	HSet    Func = "HSET"
+	HGET    Func = "HGET"
+	HGETALL Func = "HGETALL"
 )
 
 type Entity struct {
