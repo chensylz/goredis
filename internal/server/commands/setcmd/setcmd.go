@@ -47,12 +47,24 @@ func (c *Cmd) HSet(ctx context.Context, key string, field string, value interfac
 	}
 	m[field] = value
 	c.db.Set(ctx, key, m)
-	return response.Ok
+	return response.One
 }
 
 func (c *Cmd) HGetAll(ctx context.Context, key string) *protocol.ProtoValue {
-	//TODO implement me
-	panic("implement me")
+	v := c.db.Get(ctx, key)
+	if v == nil {
+		return response.NilBulk
+	}
+	m, ok := v.(map[string]interface{})
+	if !ok {
+		return response.NewErr("value is not an hash")
+	}
+	values := make([]*protocol.ProtoValue, 0)
+	for _, value := range m {
+		str := response.NewBulkString(value.(string))
+		values = append(values, str)
+	}
+	return response.NewArray(values)
 }
 
 func (c *Cmd) HDel(ctx context.Context, key string, field string) *protocol.ProtoValue {

@@ -43,3 +43,10 @@ func NewBulkString(value string) *protocol.ProtoValue {
 		Value: value,
 	}
 }
+
+func NewArray(values []*protocol.ProtoValue) *protocol.ProtoValue {
+	return &protocol.ProtoValue{
+		Type:  protocol.Array,
+		Value: values,
+	}
+}
