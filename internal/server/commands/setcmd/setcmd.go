@@ -16,14 +16,22 @@ func New(db storage.DB) *Cmd {
 	return &Cmd{db: db}
 }
 
-func (c *Cmd) HGet(ctx context.Context, key string, field string) *protocol.ProtoValue {
+func (c *Cmd) get(ctx context.Context, key string) (map[string]interface{}, *protocol.ProtoValue) {
 	v := c.db.Get(ctx, key)
 	if v == nil {
-		return response.NewBulkString("")
+		return nil, response.NewBulkString("")
 	}
 	m, ok := v.(map[string]interface{})
 	if !ok {
-		return response.NewErr("value is not an hash")
+		return nil, response.NewErr("value is not an hash")
+	}
+	return m, nil
+}
+
+func (c *Cmd) HGet(ctx context.Context, key string, field string) *protocol.ProtoValue {
+	m, err := c.get(ctx, key)
+	if err != nil {
+		return err
 	}
 	value, ok := m[field]
 	if !ok {
@@ -33,17 +41,9 @@ func (c *Cmd) HGet(ctx context.Context, key string, field string) *protocol.Prot
 }
 
 func (c *Cmd) HSet(ctx context.Context, key string, field string, value interface{}) *protocol.ProtoValue {
-	var (
-		m  map[string]interface{}
-		ok bool
-	)
-	v := c.db.Get(ctx, key)
-	if v == nil {
-		m = make(map[string]interface{})
-	}
-	m, ok = v.(map[string]interface{})
-	if !ok {
-		return response.NewErr("value is not an hash")
+	m, err := c.get(ctx, key)
+	if err != nil {
+		return err
 	}
 	m[field] = value
 	c.db.Set(ctx, key, m)
@@ -51,13 +51,9 @@ func (c *Cmd) HSet(ctx context.Context, key string, field string, value interfac
 }
 
 func (c *Cmd) HGetAll(ctx context.Context, key string) *protocol.ProtoValue {
-	v := c.db.Get(ctx, key)
-	if v == nil {
-		return response.NilBulk
-	}
-	m, ok := v.(map[string]interface{})
-	if !ok {
-		return response.NewErr("value is not an hash")
+	m, err := c.get(ctx, key)
+	if err != nil {
+		return err
 	}
 	values := make([]*protocol.ProtoValue, 0)
 	for _, value := range m {
@@ -68,8 +64,15 @@ func (c *Cmd) HGetAll(ctx context.Context, key string) *protocol.ProtoValue {
 }
 
 func (c *Cmd) HDel(ctx context.Context, key string, field string) *protocol.ProtoValue {
-	//TODO implement me
-	panic("implement me")
+	m, err := c.get(ctx, key)
+	if err != nil {
+		return err
+	}
+	_, ok := m[field]
+	if ok {
+		delete(m, field)
+	}
+	return response.One
 }
 
 func (c *Cmd) HExists(ctx context.Context, key string, field string) *protocol.ProtoValue {
