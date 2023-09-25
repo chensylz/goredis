@@ -76,6 +76,13 @@ func (c *Cmd) HDel(ctx context.Context, key string, field string) *protocol.Prot
 }
 
 func (c *Cmd) HExists(ctx context.Context, key string, field string) *protocol.ProtoValue {
-	//TODO implement me
-	panic("implement me")
+	m, err := c.get(ctx, key)
+	if err != nil {
+		return err
+	}
+	_, ok := m[field]
+	if ok {
+		return response.One
+	}
+	return response.Zero
 }

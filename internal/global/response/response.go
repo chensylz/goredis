@@ -14,6 +14,7 @@ var (
 	Ok      = NewSimpleString("Ok")
 	NilBulk = NewBulkString("")
 	One     = NewInter(1)
+	Zero    = NewInter(0)
 )
 
 func NewErr(message string) *protocol.ProtoValue {
