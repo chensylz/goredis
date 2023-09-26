@@ -43,7 +43,7 @@ func (c *Cmd) HGet(ctx context.Context, key string, field string) *protocol.Prot
 func (c *Cmd) HSet(ctx context.Context, key string, field string, value interface{}) *protocol.ProtoValue {
 	m, err := c.get(ctx, key)
 	if err != nil {
-		return err
+		m = make(map[string]interface{})
 	}
 	m[field] = value
 	c.db.Set(ctx, key, m)
